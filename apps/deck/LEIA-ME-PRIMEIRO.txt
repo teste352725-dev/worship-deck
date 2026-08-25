@@ -1,0 +1,43 @@
+WORSHIP DECK V3 ALPHA 4 RC - PACOTE COMPLETO
+=============================================
+
+Este pacote e uma instalacao COMPLETA/PORTATIL do Worship Deck V3.
+Ele NAO e apenas um UPDATE.
+
+REQUISITO ATUAL
+---------------
+- Windows 10/11
+- Node.js 18 ou superior instalado
+
+PRIMEIRA EXECUCAO
+-----------------
+1. Extraia a pasta WorshipDeck em um local fixo.
+2. Execute start.bat.
+3. Abra http://127.0.0.1:4177 no PC.
+4. No celular da mesma rede, use o endereco 192.168.x.x:4177 mostrado no terminal.
+
+CONFIGURACAO AUTOMATICA
+-----------------------
+Se config.json NAO existir, o proprio servidor cria o arquivo automaticamente
+na primeira inicializacao usando valores padrao seguros.
+
+Se config.json JA existir, o bootstrap NAO o substitui.
+As pastas profiles, backups, plugins e logs tambem sao criadas automaticamente.
+
+OBS EM OUTRO PC
+---------------
+Use a pasta WorshipAgent incluida ao lado deste programa no computador da live/OBS.
+O Worship Agent anuncia o PC do OBS na rede local sem transmitir a senha do OBS.
+
+INICIAR COM WINDOWS
+-------------------
+Execute uma vez instalar-inicializacao-windows.bat.
+
+IMPORTANTE
+----------
+- Nao abra a porta 4455 do OBS para a internet.
+- Nao abra a porta 4177 no roteador para acesso externo.
+- Para acesso remoto, use Worship Deck Web + Bridge.
+
+Esta ainda e uma versao Alpha/RC. Antes de usar em culto, mantenha uma copia da
+instalacao que ja foi validada na igreja.

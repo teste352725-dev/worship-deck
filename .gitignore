@@ -1,0 +1,22 @@
+# Worship Deck - arquivos locais / segredos
+apps/deck/config.json
+apps/agent/agent-config.json
+.env
+.env.*
+!.env.example
+
+# Dados gerados em runtime
+apps/deck/backups/*
+!apps/deck/backups/README.txt
+apps/deck/logs/*
+!apps/deck/logs/README.txt
+apps/deck/profiles/*.json
+!apps/deck/profiles/README.txt
+
+# Dependências / IDE / SO
+node_modules/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
