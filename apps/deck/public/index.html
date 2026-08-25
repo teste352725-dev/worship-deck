@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#090b10" />
+  <title>Worship Deck V3 Alpha 4 RC • Holyrics + OBS</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="desktop-shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">WORSHIP DECK</div>
+        <h1>Holyrics + OBS</h1>
+      </div>
+      <div class="top-actions">
+        <div id="connectionPill" class="pill offline"><span class="dot"></span><span id="connectionText">Holyrics desconectado</span></div>
+        <div id="obsConnectionPill" class="pill offline"><span class="dot"></span><span id="obsConnectionText">OBS desconectado</span></div>
+        <button id="settingsBtn" class="icon-btn" aria-label="Configurações">⚙</button>
+      </div>
+    </header>
+
+    <div class="monitor-grid">
+      <section class="now-playing">
+        <div class="now-label">EM EXIBIÇÃO</div>
+        <div class="now-row">
+          <div>
+            <h2 id="presentationName">Nenhuma apresentação</h2>
+            <p id="presentationMeta">Conecte ao Holyrics para começar.</p>
+          </div>
+          <div id="slideCounter" class="slide-counter">—</div>
+        </div>
+        <div id="screenState" class="screen-state">TELA NORMAL</div>
+      </section>
+
+      <section class="preview-section" aria-label="Preview do Holyrics">
+        <div class="preview-head">
+          <div>
+            <div class="section-kicker">PLUGIN HOLYRICS</div>
+            <h3>Preview ao vivo</h3>
+          </div>
+          <div class="preview-actions">
+            <span id="previewAddress" class="preview-badge">:2026 • WIDESCREEN</span>
+            <button id="refreshPreviewBtn" class="secondary small" type="button">RECARREGAR</button>
+          </div>
+        </div>
+        <div class="preview-card">
+          <iframe id="previewFrame" title="Preview ao vivo do Holyrics" loading="lazy" allow="autoplay" referrerpolicy="no-referrer"></iframe>
+        </div>
+        <p class="preview-note">Prévia vinda diretamente do Plugin Holyrics. No celular esta área continua oculta.</p>
+      </section>
+    </div>
+
+    <section class="desktop-section">
+      <div class="section-head"><div><div class="section-kicker">CONTROLES</div><h3>Projeção</h3></div></div>
+      <div class="deck-grid" aria-label="Controles do Holyrics">
+        <button class="deck-btn nav" data-command="previous"><span class="deck-icon">◀</span><span class="deck-label">ANTERIOR</span><span class="deck-hint">Slide anterior</span></button>
+        <button class="deck-btn nav" data-command="next"><span class="deck-icon">▶</span><span class="deck-label">PRÓXIMO</span><span class="deck-hint">Próximo slide</span></button>
+        <button class="deck-btn success" data-command="normal"><span class="deck-icon">▣</span><span class="deck-label">NORMAL</span><span class="deck-hint">Voltar ao conteúdo</span></button>
+        <button class="deck-btn neutral" data-command="wallpaper"><span class="deck-icon">▧</span><span class="deck-label">FUNDO</span><span class="deck-hint">Somente papel de parede</span></button>
+        <button class="deck-btn neutral" data-command="blank"><span class="deck-icon">□</span><span class="deck-label">VAZIA</span><span class="deck-hint">Tela sem conteúdo</span></button>
+        <button class="deck-btn dark" data-command="black"><span class="deck-icon">■</span><span class="deck-label">PRETA</span><span class="deck-hint">Tela totalmente preta</span></button>
+        <button class="deck-btn danger wide" data-command="close"><span class="deck-icon">×</span><span class="deck-label">ENCERRAR APRESENTAÇÃO</span><span class="deck-hint">Fechar item atual</span></button>
+      </div>
+    </section>
+
+    <section class="desktop-section favorites-section">
+      <div class="section-head">
+        <div><div class="section-kicker">HOLYRICS</div><h3>Favoritos</h3></div>
+        <button id="refreshFavoritesBtn" class="secondary small">ATUALIZAR</button>
+      </div>
+      <p class="section-note">Os favoritos são lidos diretamente do Holyrics e executados com um toque.</p>
+      <div id="desktopFavorites" class="favorites-grid"><div class="empty-card">Carregando favoritos…</div></div>
+      <div id="favoritesError" class="inline-warning hidden"></div>
+    </section>
+
+    <section class="desktop-section obs-section">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">OBS WEBSOCKET</div>
+          <h3>Cenas</h3>
+          <p id="obsMeta" class="section-note compact-note">Configure o OBS para listar as cenas.</p>
+        </div>
+        <button id="refreshObsBtn" class="secondary small">RECONECTAR / ATUALIZAR</button>
+      </div>
+      <div class="obs-monitor-grid">
+        <div class="obs-live-card">
+          <div class="obs-live-head">
+            <div><span class="obs-live-kicker">NO AR</span><strong id="obsProgramSceneName">Aguardando OBS</strong></div>
+            <button id="refreshObsPreviewsBtn" class="secondary small" type="button">ATUALIZAR PREVIEWS</button>
+          </div>
+          <div class="obs-live-frame">
+            <img id="obsProgramPreview" alt="Prévia da cena atual do OBS" />
+            <div id="obsProgramPreviewEmpty" class="obs-preview-empty">A prévia aparece quando o OBS conectar.</div>
+          </div>
+          <p class="preview-note">Captura leve da cena que está no ar. As miniaturas abaixo atualizam em intervalos maiores para não pesar no OBS.</p>
+        </div>
+      </div>
+      <div id="desktopObsScenes" class="obs-scenes-grid"><div class="empty-card">Conectando ao OBS…</div></div>
+      <div id="obsError" class="inline-warning hidden"></div>
+    </section>
+
+    <section class="desktop-section automation-section">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">HOLYRICS → OBS</div>
+          <h3>Diretor automático</h3>
+          <p class="section-note compact-note">Troca de cena somente quando o tipo muda. Avançar slides não repete a transição.</p>
+        </div>
+        <div class="automation-head-actions">
+          <span id="automationStatePill" class="automation-pill off">AUTO DESLIGADO</span>
+          <button id="resumeAutomationBtn" class="secondary small" type="button">FORÇAR AUTO AGORA</button>
+        </div>
+      </div>
+
+      <div class="automation-card">
+        <label class="toggle-row"><input id="automationEnabledInput" type="checkbox" /><span>Ativar diretor automático</span></label>
+        <div class="automation-grid">
+          <label>Música no Holyrics<select id="autoSongSceneSelect"><option value="">Não trocar cena</option></select></label>
+          <label>Bíblia / Versículo<select id="autoVerseSceneSelect"><option value="">Não trocar cena</option></select></label>
+          <label>Sem apresentação<select id="autoNoneSceneSelect"><option value="">Não trocar cena</option></select></label>
+        </div>
+        <div class="settings-divider"><span>FAVORITOS ESPECIAIS</span></div>
+        <p class="form-note">Mapeie apenas os favoritos que também devem trocar o OBS, como Oferta e Primícias. A cena fica preservada até entrar uma nova música ou um novo versículo.</p>
+        <div id="favoriteAutomationMap" class="favorite-map"><div class="empty-card">Carregando favoritos…</div></div>
+        <div class="automation-actions">
+          <span id="automationLastAction" class="automation-last">Aguardando configuração.</span>
+          <button id="saveAutomationBtn" class="primary" type="button">SALVAR AUTOMAÇÃO</button>
+        </div>
+        <div id="automationError" class="inline-warning hidden"></div>
+      </div>
+    </section>
+
+
+
+    <section id="systemSection" class="desktop-section system-section">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">V3 • CENTRAL DO SISTEMA</div>
+          <h3>Diagnóstico, perfis e backup</h3>
+          <p class="section-note compact-note">Ferramentas para deixar a instalação simples de manter e recuperar antes de virar o instalador .exe.</p>
+        </div>
+        <button id="runDiagnosticsBtn" class="primary small" type="button">TESTAR TUDO</button>
+      </div>
+
+      <div id="diagnosticsGrid" class="diagnostics-grid">
+        <div class="diagnostic-card pending"><span class="diagnostic-dot"></span><div><strong>Diagnóstico</strong><small>Clique em TESTAR TUDO para verificar Holyrics, Plugin, OBS, Agent e Web.</small></div></div>
+      </div>
+      <div id="diagnosticsMeta" class="system-meta">Ainda não executado.</div>
+
+      <div class="system-tools-grid">
+        <article class="system-tool-card">
+          <div class="system-tool-head"><span>👤</span><div><strong>Perfis</strong><small>Casa, Igreja, Evento… cada perfil guarda uma configuração completa.</small></div></div>
+          <label>Perfil atual<select id="profileSelect"><option value="">Nenhum perfil salvo</option></select></label>
+          <div class="system-tool-actions">
+            <button id="createProfileBtn" class="secondary small" type="button">NOVO</button>
+            <button id="saveProfileBtn" class="secondary small" type="button">SALVAR ATUAL</button>
+            <button id="switchProfileBtn" class="primary small" type="button">CARREGAR</button>
+            <button id="deleteProfileBtn" class="secondary small danger-outline" type="button">EXCLUIR</button>
+          </div>
+          <p id="profileStatus" class="form-note compact">Perfil ativo: Principal</p>
+        </article>
+
+        <article class="system-tool-card">
+          <div class="system-tool-head"><span>💾</span><div><strong>Backup</strong><small>Exporte a configuração antes de formatar ou trocar o computador.</small></div></div>
+          <label class="toggle-row backup-secret-row"><input id="backupIncludeSecretsInput" type="checkbox" /><span>Incluir tokens e senhas no backup</span></label>
+          <p class="form-note compact">Sem marcar, o arquivo não leva token do Holyrics, senha do OBS nem segredo do Bridge.</p>
+          <div class="system-tool-actions">
+            <button id="exportBackupBtn" class="primary small" type="button">EXPORTAR</button>
+            <button id="importBackupBtn" class="secondary small" type="button">IMPORTAR</button>
+            <input id="backupFileInput" class="hidden" type="file" accept="application/json,.json" />
+          </div>
+        </article>
+
+        <article class="system-tool-card">
+          <div class="system-tool-head"><span>🧭</span><div><strong>Primeiro acesso</strong><small>Assistente guiado para uma igreja configurar o Deck sem precisar conhecer a arquitetura.</small></div></div>
+          <div class="first-run-summary">
+            <span>1. Holyrics</span><span>2. OBS / Agent</span><span>3. Mobile</span><span>4. Pronto</span>
+          </div>
+          <button id="openWizardBtn" class="primary" type="button">ABRIR ASSISTENTE</button>
+        </article>
+      </div>
+      <div id="systemToolsError" class="inline-warning hidden"></div>
+    </section>
+
+    <section class="desktop-section mobile-custom-section">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">V3 • MOBILE</div>
+          <h3>Personalização do Deck</h3>
+          <p class="section-note compact-note">A aparência é configurada aqui no PC; o celular continua abrindo direto na operação rápida.</p>
+        </div>
+        <span id="mobileAutoSaveStatus" class="autosave-pill">SALVO AUTOMATICAMENTE</span>
+      </div>
+      <div class="mobile-custom-card">
+        <div class="mobile-custom-grid">
+          <label>Tema<select id="mobileThemeInput"><option value="dark">Escuro</option><option value="light">Claro suave</option><option value="system">Seguir aparelho</option></select></label>
+          <label>Tela inicial<select id="mobileDefaultViewInput"><option value="controls">Controles</option><option value="favorites">Favoritos</option><option value="obs">OBS</option><option value="now">Agora / Monitor</option><option value="panel">Central</option></select></label>
+          <label class="toggle-row mobile-tabs-setting"><input id="mobileShowTabsInput" type="checkbox" /><span>Mostrar abas no celular</span></label>
+          <label>Monitor do celular<select id="mobileMonitorModeInput"><option value="none">Nenhum</option><option value="holyrics">Holyrics</option><option value="obs">OBS — Programa</option><option value="youtube">YouTube — Live</option></select></label>
+          <label>ID do vídeo/live YouTube<input id="youtubeVideoIdInput" autocomplete="off" placeholder="Ex.: dQw4w9WgXcQ" /></label>
+          <label>Retrato — colunas<input id="mobilePortraitColsInput" type="number" min="1" max="6" /></label>
+          <label>Retrato — linhas<input id="mobilePortraitRowsInput" type="number" min="1" max="8" /></label>
+          <label>Paisagem — colunas<input id="mobileLandscapeColsInput" type="number" min="1" max="8" /></label>
+          <label>Paisagem — linhas<input id="mobileLandscapeRowsInput" type="number" min="1" max="6" /></label>
+        </div>
+        <div class="settings-divider"><span>BOTÕES DE CONTROLE</span></div>
+        <div id="mobileControlEditor" class="mobile-style-editor"></div>
+        <div class="settings-divider"><span>FAVORITOS</span></div>
+        <p class="form-note">Você pode trocar o nome mostrado, ícone, cor, ordem e ocultar um favorito sem alterar o favorito original no Holyrics.</p>
+        <div id="mobileFavoriteEditor" class="mobile-style-editor"><div class="empty-card">Carregando favoritos…</div></div>
+        <div class="settings-divider"><span>CENAS DO OBS</span></div>
+        <div id="mobileObsEditor" class="mobile-style-editor"><div class="empty-card">Conecte ao OBS para personalizar as cenas.</div></div>
+        <div id="mobileLayoutError" class="inline-warning hidden"></div>
+      </div>
+    </section>
+
+    <footer><span>V3 Alpha 4 RC • Estabilização mobile</span><span id="lastUpdate">Aguardando conexão</span></footer>
+  </main>
+
+  <main class="mobile-shell" aria-label="Worship Deck mobile">
+    <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Abrir menu">☰</button>
+    <div id="mobileDrawerBackdrop" class="mobile-drawer-backdrop"></div>
+    <aside id="mobileDrawer" class="mobile-drawer" aria-label="Menu Worship Deck">
+      <div class="mobile-drawer-brand"><strong>Worship Deck</strong><span>V3 Alpha 4 RC • Modo Deck</span></div>
+      <button data-mobile-nav="controls">▦ <span>Quick Deck</span></button>
+      <button data-mobile-nav="now">◫ <span>Agora / Letras</span></button>
+      <button data-mobile-nav="favorites">★ <span>Favoritos</span></button>
+      <button data-mobile-nav="obs">● <span>OBS</span></button>
+
+      <div class="mobile-drawer-divider"></div>
+      <div class="mobile-drawer-caption">CENTRAL</div>
+      <div class="mobile-drawer-mini-grid mobile-drawer-mini-grid-wide">
+        <button data-mobile-panel="status">◉ <span>Status</span></button>
+        <button data-mobile-panel="director">↯ <span>Diretor</span></button>
+        <button data-mobile-panel="connections">⌁ <span>Conexões</span></button>
+        <button data-mobile-panel="system">✓ <span>Sistema</span></button>
+        <button data-mobile-panel="visual">◐ <span>Visual</span></button>
+      </div>
+
+      <div class="mobile-drawer-divider"></div>
+      <label>Monitor<select id="mobileMonitorSelect"><option value="none">Nenhum</option><option value="holyrics">Holyrics</option><option value="obs">OBS — Programa</option><option value="youtube">YouTube — Live</option></select></label>
+      <label>Tema<select id="mobileThemeSelect"><option value="dark">Escuro</option><option value="light">Claro suave</option><option value="system">Sistema</option></select></label>
+      <button id="openFloatingMonitorBtn" type="button">▣ <span>Abrir monitor flutuante</span></button>
+
+      <div class="mobile-drawer-divider"></div>
+      <div class="mobile-drawer-caption">MODO DE INTERFACE</div>
+      <div class="mobile-mode-badge">MODO DECK</div>
+      <small>A interface se adapta ao aparelho. No celular, todas as funções do painel ficam organizadas nas abas acima; não é mais necessário abrir o Desktop clássico.</small>
+    </aside>
+
+    <nav class="mobile-tabs" aria-label="Modo do Deck">
+      <button class="mobile-tab active" data-mobile-tab="controls"><span class="mobile-status-dot"></span><b>DECK</b></button>
+      <button class="mobile-tab" data-mobile-tab="favorites">★ <b>FAV</b></button>
+      <button class="mobile-tab" data-mobile-tab="obs"><span class="mobile-obs-dot"></span><b>OBS</b></button>
+    </nav>
+
+    <section id="mobileControlsView" class="mobile-view active">
+      <div id="mobileControlsPager" class="mobile-pager" aria-label="Controles"></div>
+      <div id="mobileControlsDots" class="mobile-dots" aria-hidden="true"></div>
+    </section>
+
+    <section id="mobileFavoritesView" class="mobile-view">
+      <div id="mobileFavoritesPager" class="mobile-pager" aria-label="Favoritos"></div>
+      <div id="mobileFavoritesDots" class="mobile-dots" aria-hidden="true"></div>
+    </section>
+
+    <section id="mobileObsView" class="mobile-view">
+      <div id="mobileObsPager" class="mobile-pager" aria-label="Cenas do OBS"></div>
+      <div id="mobileObsDots" class="mobile-dots" aria-hidden="true"></div>
+    </section>
+
+    <section id="mobileNowView" class="mobile-view mobile-now-view">
+      <div id="mobileMonitorCard" class="mobile-monitor-card">
+        <div class="mobile-monitor-empty">Escolha Holyrics, OBS ou YouTube no menu.</div>
+      </div>
+      <div class="mobile-lyrics-stack">
+        <article class="mobile-lyric current"><span>AGORA</span><strong id="mobileCurrentText">Nenhuma apresentação</strong></article>
+        <article class="mobile-lyric next"><span>PRÓXIMA</span><strong id="mobileNextText">—</strong></article>
+        <article class="mobile-lyric after"><span>DEPOIS</span><strong id="mobileAfterText">—</strong></article>
+      </div>
+      <div class="mobile-now-controls">
+        <button class="mobile-mini-control" data-command="previous">◀ ANTERIOR</button>
+        <button class="mobile-mini-control danger" data-command="black">■ PRETA</button>
+        <button class="mobile-mini-control" data-command="next">PRÓXIMO ▶</button>
+      </div>
+    </section>
+
+    <section id="mobilePanelView" class="mobile-view mobile-panel-view">
+      <header class="mobile-panel-head">
+        <button id="mobilePanelMenuBtn" type="button" aria-label="Abrir menu">☰</button>
+        <div><span>CENTRAL</span><strong id="mobilePanelTitle">Status</strong></div>
+      </header>
+
+      <div class="mobile-panel-page active" data-panel-page="status">
+        <div class="mobile-panel-status-grid">
+          <article id="mobilePanelHolyrics" class="mobile-panel-card status-card"><span class="status-light"></span><div><small>HOLYRICS</small><strong id="mobilePanelHolyricsText">Verificando…</strong></div></article>
+          <article id="mobilePanelObs" class="mobile-panel-card status-card"><span class="status-light"></span><div><small>OBS</small><strong id="mobilePanelObsText">Verificando…</strong></div></article>
+        </div>
+        <article class="mobile-panel-card">
+          <small>EM EXIBIÇÃO</small>
+          <strong id="mobilePanelPresentation">Nenhuma apresentação</strong>
+          <span id="mobilePanelPresentationMeta">—</span>
+        </article>
+        <article class="mobile-panel-card">
+          <small>CENA NO AR</small>
+          <strong id="mobilePanelScene">—</strong>
+          <span id="mobilePanelScreenState">TELA NORMAL</span>
+        </article>
+        <button id="mobileOpenNowBtn" class="mobile-panel-primary" type="button">ABRIR AGORA / LETRAS / MONITOR</button>
+      </div>
+
+      <div class="mobile-panel-page" data-panel-page="director">
+        <article class="mobile-panel-card">
+          <div class="mobile-panel-row"><div><small>DIRETOR AUTOMÁTICO</small><strong id="mobilePanelAutoState">—</strong></div><label class="mobile-switch"><input id="mobileAutomationEnabled" type="checkbox"><span></span></label></div>
+          <label>Música<select id="mobileAutoSongScene"></select></label>
+          <label>Bíblia / Versículo<select id="mobileAutoVerseScene"></select></label>
+          <label>Sem apresentação<select id="mobileAutoNoneScene"></select></label>
+          <p class="mobile-panel-note">As mudanças principais são salvas automaticamente.</p>
+        </article>
+        <article class="mobile-panel-card">
+          <small>FAVORITOS ESPECIAIS</small>
+          <span>Mapeie os favoritos que também devem trocar a cena do OBS.</span>
+          <div id="mobileFavoriteAutomationMap" class="mobile-favorite-auto-map"><div class="mobile-empty">Carregando favoritos…</div></div>
+          <button id="mobileSaveFavoriteAutomationBtn" class="mobile-panel-secondary" type="button">SALVAR MAPEAMENTOS</button>
+        </article>
+        <button id="mobileForceAutoBtn" class="mobile-panel-secondary" type="button">FORÇAR AUTO AGORA</button>
+      </div>
+
+      <div class="mobile-panel-page" data-panel-page="connections">
+        <article class="mobile-panel-card">
+          <small>HOLYRICS API</small>
+          <label>IP / Host<input id="mobileCfgHolyricsHost" autocomplete="off" placeholder="127.0.0.1"></label>
+          <div class="mobile-two-cols"><label>Porta<input id="mobileCfgHolyricsPort" type="number" inputmode="numeric" placeholder="8091"></label><label>Token<input id="mobileCfgHolyricsToken" type="password" autocomplete="off" placeholder="Deixe vazio para manter"></label></div>
+        </article>
+        <article class="mobile-panel-card">
+          <small>PLUGIN / PREVIEW HOLYRICS</small>
+          <div class="mobile-two-cols"><label>Host<input id="mobileCfgPluginHost" autocomplete="off" placeholder="127.0.0.1"></label><label>Porta<input id="mobileCfgPluginPort" type="number" inputmode="numeric" placeholder="2026"></label></div>
+          <label>Visualização<select id="mobileCfgPreviewMode"><option value="widescreen">Widescreen</option><option value="standard">Standard</option><option value="text">Text</option><option value="text2">Text 2</option><option value="text3">Text 3</option><option value="multiview">Multiview</option></select></label>
+        </article>
+        <article class="mobile-panel-card">
+          <small>OBS WEBSOCKET</small>
+          <div class="mobile-two-cols"><label>Host manual<input id="mobileCfgObsHost" autocomplete="off" placeholder="127.0.0.1"></label><label>Porta<input id="mobileCfgObsPort" type="number" inputmode="numeric" placeholder="4455"></label></div>
+          <label>Senha<input id="mobileCfgObsPassword" type="password" autocomplete="off" placeholder="Deixe vazio para manter"></label>
+          <label class="mobile-check"><input id="mobileCfgObsAutoDiscover" type="checkbox"><span>Localizar automaticamente com Worship Agent</span></label>
+          <label>Worship Agent<select id="mobileCfgObsAgent"><option value="">Automático — primeiro disponível</option></select></label>
+          <div class="mobile-inline-actions"><span id="mobileCfgAgentStatus">Procurando Agent…</span><button id="mobileCfgRefreshAgents" class="mobile-panel-secondary compact" type="button">PROCURAR</button></div>
+        </article>
+        <article class="mobile-panel-card">
+          <small>WORSHIP DECK WEB / BRIDGE</small>
+          <label class="mobile-check"><input id="mobileCfgCloudEnabled" type="checkbox"><span>Conectar este PC à versão Web</span></label>
+          <label>Endereço Web<input id="mobileCfgCloudBaseUrl" autocomplete="off" placeholder="https://...vercel.app"></label>
+          <label>Bridge Secret<input id="mobileCfgCloudSecret" type="password" autocomplete="off" placeholder="Deixe vazio para manter"></label>
+        </article>
+        <article class="mobile-panel-card">
+          <small>REDE DO CELULAR</small>
+          <div id="mobileNetworkAddresses" class="network-addresses">Detectando rede…</div>
+          <button id="mobileRefreshNetworkBtn" class="mobile-panel-secondary" type="button">ATUALIZAR IP</button>
+        </article>
+        <button id="mobileSaveConnectionsBtn" class="mobile-panel-primary" type="button">SALVAR CONEXÕES</button>
+        <div class="mobile-three-actions"><button id="mobileTestHolyricsBtn" class="mobile-panel-secondary" type="button">TESTAR HOLYRICS</button><button id="mobileTestObsBtn" class="mobile-panel-secondary" type="button">TESTAR OBS</button><button id="mobileTestWebBtn" class="mobile-panel-secondary" type="button">TESTAR WEB</button></div>
+      </div>
+
+      <div class="mobile-panel-page" data-panel-page="system">
+        <button id="mobileRunDiagnosticsBtn" class="mobile-panel-primary" type="button">TESTAR TODAS AS CONEXÕES</button>
+        <div id="mobileDiagnosticsGrid" class="mobile-diagnostics-grid"><div class="mobile-panel-card"><small>DIAGNÓSTICO</small><strong>Ainda não executado</strong></div></div>
+
+        <article class="mobile-panel-card">
+          <small>PERFIS</small>
+          <label>Perfil atual<select id="mobileProfileSelect"><option value="">Nenhum perfil salvo</option></select></label>
+          <div class="mobile-action-grid"><button id="mobileCreateProfileBtn" class="mobile-panel-secondary" type="button">NOVO</button><button id="mobileSaveProfileBtn" class="mobile-panel-secondary" type="button">SALVAR ATUAL</button><button id="mobileSwitchProfileBtn" class="mobile-panel-primary" type="button">CARREGAR</button><button id="mobileDeleteProfileBtn" class="mobile-panel-secondary danger-outline" type="button">EXCLUIR</button></div>
+          <span id="mobileProfileStatus">Perfil ativo: Principal</span>
+        </article>
+
+        <article class="mobile-panel-card">
+          <small>BACKUP</small>
+          <label class="mobile-check"><input id="mobileBackupIncludeSecrets" type="checkbox"><span>Incluir tokens e senhas</span></label>
+          <span>Sem marcar, o backup não inclui token do Holyrics, senha do OBS nem segredo do Bridge.</span>
+          <div class="mobile-two-actions"><button id="mobileExportBackupBtn" class="mobile-panel-primary" type="button">EXPORTAR</button><button id="mobileImportBackupBtn" class="mobile-panel-secondary" type="button">IMPORTAR</button></div>
+          <input id="mobileBackupFileInput" class="hidden" type="file" accept="application/json,.json">
+        </article>
+
+        <article class="mobile-panel-card">
+          <small>CONFIGURAÇÃO</small>
+          <strong>Assistente de instalação</strong>
+          <span>Refaça a configuração de Holyrics, OBS/Agent e interface quando realmente precisar alterar a instalação.</span>
+          <button id="mobileOpenWizardBtn" class="mobile-panel-secondary" type="button">ABRIR ASSISTENTE DE CONFIGURAÇÃO</button>
+        </article>
+
+        <article id="mobileTourTools" class="mobile-panel-card mobile-tour-tools">
+          <small>AJUDA E TOURS</small>
+          <strong>Conheça o Worship Deck</strong>
+          <span>Cada aparelho guarda localmente o que já viu. Novidades futuras podem aparecer uma única vez sem repetir o tour inteiro.</span>
+          <div class="mobile-two-actions">
+            <button id="mobileStartBasicTourBtn" class="mobile-panel-primary" type="button">TOUR BÁSICO</button>
+            <button id="mobileStartAdvancedTourBtn" class="mobile-panel-secondary" type="button">TOUR AVANÇADO</button>
+          </div>
+          <button id="mobileStartWhatsNewTourBtn" class="mobile-panel-secondary" type="button">VER NOVIDADES PENDENTES</button>
+        </article>
+      </div>
+
+      <div class="mobile-panel-page" data-panel-page="visual">
+        <article class="mobile-panel-card mobile-visual-card">
+          <small>APARÊNCIA E COMPORTAMENTO</small>
+          <label>Tema<select id="mobilePanelTheme"><option value="dark">Escuro</option><option value="light">Claro suave</option><option value="system">Sistema</option></select></label>
+          <label>Tela inicial<select id="mobilePanelDefaultView"><option value="controls">Quick Deck</option><option value="favorites">Favoritos</option><option value="obs">OBS</option><option value="now">Agora / Monitor</option><option value="panel">Central</option></select></label>
+          <label>Monitor<select id="mobilePanelMonitor"><option value="none">Nenhum</option><option value="holyrics">Holyrics</option><option value="obs">OBS — Programa</option><option value="youtube">YouTube — Live</option></select></label>
+          <label>ID/link YouTube<input id="mobilePanelYoutube" placeholder="ID ou link da live"></label>
+          <label class="mobile-check"><input id="mobilePanelShowTabs" type="checkbox"><span>Mostrar abas rápidas no topo</span></label>
+          <div class="mobile-grid-settings">
+            <label>Retrato col.<input id="mobilePanelPortraitCols" type="number" min="1" max="6"></label>
+            <label>Retrato lin.<input id="mobilePanelPortraitRows" type="number" min="1" max="8"></label>
+            <label>Paisagem col.<input id="mobilePanelLandscapeCols" type="number" min="1" max="8"></label>
+            <label>Paisagem lin.<input id="mobilePanelLandscapeRows" type="number" min="1" max="6"></label>
+          </div>
+          <div class="mobile-autosave-hint"><span class="autosave-dot"></span><span id="mobilePanelSaveState">Salvo automaticamente</span></div>
+        </article>
+        <button id="mobilePanelFloatingBtn" class="mobile-panel-secondary" type="button">ABRIR MONITOR FLUTUANTE</button>
+
+        <details class="mobile-config-details"><summary>Botões de controle</summary><div id="mobilePanelControlEditor" class="mobile-style-editor mobile-style-editor-compact"></div></details>
+        <details class="mobile-config-details"><summary>Favoritos</summary><div id="mobilePanelFavoriteEditor" class="mobile-style-editor mobile-style-editor-compact"><div class="mobile-empty">Carregando…</div></div></details>
+        <details class="mobile-config-details"><summary>Cenas do OBS</summary><div id="mobilePanelObsEditor" class="mobile-style-editor mobile-style-editor-compact"><div class="mobile-empty">Carregando…</div></div></details>
+      </div>
+    </section>
+
+    <div id="floatingMonitor" class="floating-monitor hidden" aria-label="Monitor flutuante">
+      <div id="floatingMonitorHead" class="floating-monitor-head">
+        <div><span class="floating-monitor-grip">⠿</span><strong>MONITOR</strong></div>
+        <div class="floating-monitor-actions"><button id="floatingMonitorResetBtn" type="button" title="Restaurar tamanho">↺</button><button id="floatingMonitorCloseBtn" type="button" title="Fechar">×</button></div>
+      </div>
+      <div id="floatingMonitorBody" class="floating-monitor-body"><div class="mobile-monitor-empty">Monitor</div></div>
+      <div id="floatingMonitorResize" class="floating-monitor-resize" aria-label="Redimensionar"></div>
+    </div>
+  </main>
+
+  <button id="returnToMobileBtn" class="return-mobile-btn" type="button">📱 VOLTAR AO DECK</button>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <dialog id="settingsDialog">
+    <form id="settingsForm" method="dialog">
+      <div class="dialog-head">
+        <div><div class="eyebrow">CONEXÕES</div><h3>Configurações</h3></div>
+        <button class="icon-btn" value="cancel" aria-label="Fechar">×</button>
+      </div>
+
+      <div class="settings-divider"><span>HOLYRICS</span></div>
+      <label>IP / Host do Holyrics<input id="hostInput" name="host" autocomplete="off" placeholder="127.0.0.1" /></label>
+      <label>Porta da API<input id="portInput" name="port" type="number" inputmode="numeric" placeholder="8091" /></label>
+      <label>Token de acesso<input id="tokenInput" name="token" type="password" autocomplete="off" placeholder="Cole o token criado no Holyrics" /></label>
+
+      <div class="settings-divider"><span>PREVIEW HOLYRICS</span></div>
+      <label>IP / Host do Plugin Holyrics<input id="pluginHostInput" name="pluginHost" autocomplete="off" placeholder="127.0.0.1" /></label>
+      <label>Porta do Plugin Holyrics<input id="pluginPortInput" name="pluginPort" type="number" inputmode="numeric" placeholder="2026" /></label>
+      <label>Visualização do preview
+        <select id="previewModeInput" name="previewMode">
+          <option value="widescreen">Widescreen — imagem + texto</option>
+          <option value="standard">Standard</option>
+          <option value="text">Text</option>
+          <option value="text2">Text 2</option>
+          <option value="text3">Text 3</option>
+          <option value="multiview">Multiview</option>
+        </select>
+      </label>
+
+      <div class="settings-divider"><span>OBS WEBSOCKET</span></div>
+      <label>IP / Host do PC do OBS<input id="obsHostInput" name="obsHost" autocomplete="off" placeholder="127.0.0.1" /></label>
+      <label>Porta do WebSocket<input id="obsPortInput" name="obsPort" type="number" inputmode="numeric" placeholder="4455" /></label>
+      <label>Senha do WebSocket<input id="obsPasswordInput" name="obsPassword" type="password" autocomplete="off" placeholder="Senha configurada no OBS" /></label>
+      <label class="toggle-row"><input id="obsAutoDiscoverInput" type="checkbox" /><span>Localizar automaticamente o PC do OBS com Worship Agent</span></label>
+      <label>Worship Agent encontrado<select id="obsAgentSelect"><option value="">Automático — primeiro Agent disponível</option></select></label>
+      <div class="agent-row"><span id="obsAgentStatus">Nenhum Agent detectado.</span><button type="button" id="refreshAgentsBtn" class="secondary small">PROCURAR</button></div>
+      <p class="form-note">Sem Agent, o IP manual continua funcionando. Com o Worship Agent no PC da live, o Deck acompanha mudanças de IP automaticamente. Nenhuma senha do OBS é anunciada na rede.</p>
+
+      <div class="settings-divider"><span>WORSHIP DECK WEB</span></div>
+      <label class="toggle-row"><input id="cloudEnabledInput" type="checkbox" /><span>Conectar este PC ao Worship Deck Web</span></label>
+      <label>Endereço HTTPS da versão Web<input id="cloudBaseUrlInput" autocomplete="off" placeholder="https://seu-worship-deck.vercel.app" /></label>
+      <label>Segredo do Bridge<input id="cloudBridgeSecretInput" type="password" autocomplete="off" placeholder="Cole o mesmo BRIDGE_SECRET configurado na Web" /></label>
+      <p class="form-note">A conexão é iniciada <strong>deste PC para a internet</strong>. Nenhuma porta do OBS é aberta no roteador. O segredo fica salvo somente no <code>config.json</code> local.</p>
+
+      <div class="settings-divider"><span>REDE DO CELULAR</span></div>
+      <div class="network-card">
+        <div class="network-card-head"><strong>Endereço atual do Worship Deck</strong><button type="button" id="refreshNetworkBtn" class="secondary small">ATUALIZAR IP</button></div>
+        <div id="networkAddresses" class="network-addresses">Detectando rede atual…</div>
+        <p class="form-note compact">Abra um destes endereços no celular conectado ao mesmo Wi‑Fi. Ao mudar de rede, reinicie o Deck e use o novo IP mostrado aqui.</p>
+      </div>
+
+      <div class="permissions">
+        <strong>Holyrics — permissões do token:</strong>
+        <span>ActionNext, ActionPrevious, CloseCurrentPresentation, GetCurrentPresentation, GetF8, GetF9, GetF10, SetF8, SetF9, SetF10, <strong>GetFavorites, FavoriteAction</strong></span>
+      </div>
+      <div class="dialog-actions split-actions">
+        <button type="button" id="testBtn" class="secondary">TESTAR HOLYRICS</button>
+        <button type="button" id="testObsBtn" class="secondary">TESTAR OBS</button>
+        <button type="button" id="testCloudBtn" class="secondary">TESTAR WEB</button>
+        <button type="submit" class="primary">SALVAR</button>
+      </div>
+    </form>
+  </dialog>
+
+
+
+  <div id="guidedTourBlocker" class="guided-tour-blocker hidden" aria-hidden="true"></div>
+  <div id="guidedTourSpotlight" class="guided-tour-spotlight hidden no-target" aria-hidden="true"></div>
+  <aside id="guidedTourCard" class="guided-tour-card hidden" aria-live="polite" aria-label="Tour do Worship Deck">
+    <div class="guided-tour-topline"><span id="guidedTourKicker">TOUR BÁSICO</span><span id="guidedTourCounter">1 / 1</span></div>
+    <h3 id="guidedTourTitle">Worship Deck</h3>
+    <p id="guidedTourText"></p>
+    <div id="guidedTourActions" class="guided-tour-actions">
+      <button id="guidedTourSkipBtn" class="guided-tour-ghost" type="button">SAIR</button>
+      <button id="guidedTourBackBtn" class="guided-tour-ghost hidden" type="button">VOLTAR</button>
+      <button id="guidedTourNextBtn" class="guided-tour-primary" type="button">PRÓXIMO</button>
+    </div>
+    <div id="guidedTourChoice" class="guided-tour-choice hidden">
+      <span>Quer conhecer também as opções avançadas?</span>
+      <button id="guidedTourStartAdvancedBtn" class="guided-tour-primary" type="button">SIM, TOUR AVANÇADO</button>
+      <button id="guidedTourGoDeckBtn" class="guided-tour-ghost" type="button">NÃO, IR PARA O DECK</button>
+    </div>
+  </aside>
+
+  <dialog id="wizardDialog" class="wizard-dialog">
+    <form id="wizardForm" method="dialog">
+      <div class="dialog-head">
+        <div><div class="eyebrow">WORSHIP DECK V3</div><h3>Assistente de primeiro acesso</h3></div>
+        <button id="closeWizardBtn" class="icon-btn" type="button" aria-label="Fechar">×</button>
+      </div>
+      <div class="wizard-progress"><span data-wizard-progress="1" class="active">1</span><span data-wizard-progress="2">2</span><span data-wizard-progress="3">3</span><span data-wizard-progress="4">4</span></div>
+
+      <section class="wizard-step active" data-wizard-step="1">
+        <div class="wizard-hero"><span class="wizard-logo">W</span><div><strong>Bem-vindo ao Worship Deck</strong><p>Vamos configurar o essencial. Depois você pode personalizar automações, favoritos e Web com mais calma.</p></div></div>
+        <div class="wizard-checklist"><span>✓ Holyrics</span><span>✓ OBS / Worship Agent</span><span>✓ Layout do celular</span></div>
+      </section>
+
+      <section class="wizard-step" data-wizard-step="2">
+        <div class="settings-divider"><span>HOLYRICS</span></div>
+        <label>IP / Host do Holyrics<input id="wizardHolyricsHost" autocomplete="off" placeholder="127.0.0.1" /></label>
+        <label>Porta da API<input id="wizardHolyricsPort" type="number" inputmode="numeric" placeholder="8091" /></label>
+        <label>Token de acesso<input id="wizardHolyricsToken" type="password" autocomplete="off" placeholder="Deixe vazio para manter o token atual" /></label>
+        <div class="wizard-two-cols">
+          <label>Host do Plugin<input id="wizardPluginHost" autocomplete="off" placeholder="127.0.0.1" /></label>
+          <label>Porta do Plugin<input id="wizardPluginPort" type="number" inputmode="numeric" placeholder="2026" /></label>
+        </div>
+        <p class="form-note">O token precisa das permissões usadas pelo Deck. O assistente nunca mostra o token que já está salvo.</p>
+      </section>
+
+      <section class="wizard-step" data-wizard-step="3">
+        <div class="settings-divider"><span>OBS</span></div>
+        <label class="toggle-row"><input id="wizardObsAutoDiscover" type="checkbox" /><span>Encontrar o PC do OBS automaticamente com Worship Agent</span></label>
+        <div class="wizard-two-cols">
+          <label>IP / Host manual do OBS<input id="wizardObsHost" autocomplete="off" placeholder="127.0.0.1" /></label>
+          <label>Porta WebSocket<input id="wizardObsPort" type="number" inputmode="numeric" placeholder="4455" /></label>
+        </div>
+        <label>Senha do WebSocket<input id="wizardObsPassword" type="password" autocomplete="off" placeholder="Deixe vazio para manter a senha atual" /></label>
+        <div id="wizardAgentHint" class="wizard-hint">Procurando Worship Agent…</div>
+      </section>
+
+      <section class="wizard-step" data-wizard-step="4">
+        <div class="settings-divider"><span>CELULAR</span></div>
+        <div class="wizard-two-cols">
+          <label>Tema<select id="wizardMobileTheme"><option value="dark">Escuro</option><option value="light">Claro suave</option><option value="system">Seguir aparelho</option></select></label>
+          <label>Tela inicial<select id="wizardMobileDefaultView"><option value="controls">Quick Deck</option><option value="favorites">Favoritos</option><option value="obs">OBS</option><option value="now">Agora / Monitor</option><option value="panel">Central</option></select></label>
+        </div>
+        <div class="wizard-two-cols">
+          <label>Paisagem — colunas<input id="wizardLandscapeCols" type="number" min="1" max="8" /></label>
+          <label>Paisagem — linhas<input id="wizardLandscapeRows" type="number" min="1" max="6" /></label>
+        </div>
+        <label class="toggle-row"><input id="wizardShowTabs" type="checkbox" /><span>Mostrar abas no celular</span></label>
+        <div class="wizard-ready"><strong>Pronto para salvar</strong><p>O assistente só altera os campos acima. Diretor automático, favoritos especiais e Web continuam preservados.</p></div>
+      </section>
+
+      <div class="dialog-actions wizard-actions">
+        <button id="wizardBackBtn" class="secondary" type="button">VOLTAR</button>
+        <button id="wizardNextBtn" class="primary" type="button">PRÓXIMO</button>
+        <button id="wizardFinishBtn" class="primary hidden" type="button">SALVAR E CONCLUIR</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
