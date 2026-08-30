@@ -8,6 +8,8 @@ Painel de controle para operação de culto com integração entre **Holyrics**,
 
 - `apps/deck/` — servidor local e interface do Worship Deck.
 - `apps/agent/` — Worship Agent para o computador da live/OBS.
+- `apps/web/` — shell Vercel que reutiliza exatamente o frontend do Deck local.
+- `scripts/build-web.js` — sincroniza a interface compartilhada para o build Web.
 - `docs/` — documentação do projeto.
 
 ## Requisitos atuais
