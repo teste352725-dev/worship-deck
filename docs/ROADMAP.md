@@ -10,7 +10,7 @@
 
 ## Próximos passos
 
-1. Unificar o frontend Local + Web.
+1. ✅ Unificar o frontend Local + Web (Runtime API v1 + build compartilhado).
 2. Adicionar modo de conexão Automático / Local / Remoto.
 3. Adicionar proteção administrativa por PIN.
 4. Melhorar reconexão e tratamento de falhas.

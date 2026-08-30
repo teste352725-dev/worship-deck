@@ -20,3 +20,6 @@ node_modules/
 .DS_Store
 Thumbs.db
 *.log
+
+# Build gerado da Web (fonte oficial fica em apps/deck/public)
+apps/web/public/
