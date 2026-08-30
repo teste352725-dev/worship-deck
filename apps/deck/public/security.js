@@ -21,6 +21,14 @@
     return `${mobile ? 'Celular / Tablet' : 'Navegador PC'}${platform ? ` • ${platform}` : ''}`.slice(0,80);
   }
 
+  function safeHeaderText(value, max = 120) {
+    return String(value || '')
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\x20-\x7E]/g, '?')
+      .slice(0, max);
+  }
+
   let deviceId = localStorage.getItem(DEVICE_ID_KEY) || uuid();
   localStorage.setItem(DEVICE_ID_KEY, deviceId);
   let deviceName = localStorage.getItem(DEVICE_NAME_KEY) || guessedName();
@@ -53,10 +61,10 @@
   function withSecurityHeaders(input, init) {
     if (!activeIsLocal() || !isApiInput(input)) return [input, init];
     const headers = new Headers(init?.headers || (input instanceof Request ? input.headers : undefined));
-    headers.set('X-Worship-Device-Id', deviceId);
-    headers.set('X-Worship-Device-Name', deviceName);
-    if (deviceToken) headers.set('X-Worship-Device-Token', deviceToken);
-    if (sessionToken) headers.set('X-Worship-Session', sessionToken);
+    headers.set('X-Worship-Device-Id', safeHeaderText(deviceId));
+    headers.set('X-Worship-Device-Name', safeHeaderText(deviceName, 80));
+    if (deviceToken) headers.set('X-Worship-Device-Token', safeHeaderText(deviceToken, 500));
+    if (sessionToken) headers.set('X-Worship-Session', safeHeaderText(sessionToken, 1000));
     if (input instanceof Request) return [new Request(input, { headers }), init];
     return [input, { ...(init || {}), headers }];
   }
