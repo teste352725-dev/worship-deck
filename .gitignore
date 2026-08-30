@@ -1,5 +1,7 @@
 # Worship Deck - arquivos locais / segredos
 apps/deck/config.json
+apps/deck/security-store.json
+apps/deck/security-store.json.tmp
 apps/agent/agent-config.json
 .env
 .env.*
