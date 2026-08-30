@@ -11,9 +11,9 @@
 ## Próximos passos
 
 1. ✅ Unificar o frontend Local + Web (Runtime API v1 + build compartilhado).
-2. Adicionar modo de conexão Automático / Local / Remoto.
+2. ✅ Adicionar modo de conexão Automático / Local / Remoto (preferência por dispositivo + ponto de extensão para descoberta nativa no APK).
 3. Adicionar proteção administrativa por PIN.
 4. Melhorar reconexão e tratamento de falhas.
-5. Publicar a V3 Web no Vercel.
+5. Publicar a V3 Web no Vercel e completar o backend do contrato unificado `/api/*`.
 6. Gerar APK beta.
 7. Gerar instaladores Windows.
