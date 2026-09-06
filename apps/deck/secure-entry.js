@@ -10,9 +10,11 @@ function safeNetworkInterfaces() {
 const http = require('http');
 const crypto = require('crypto');
 
-const ROOT = __dirname;
-const PUBLIC = path.join(ROOT, 'public');
-const STORE_FILE = path.join(ROOT, 'security-store.json');
+const APP_ROOT = __dirname;
+const DATA_ROOT = process.env.WORSHIP_DECK_DATA_DIR || APP_ROOT;
+const PUBLIC = path.join(APP_ROOT, 'public');
+const STORE_FILE = path.join(DATA_ROOT, 'security-store.json');
+try { fs.mkdirSync(DATA_ROOT, { recursive: true }); } catch {}
 const STORE_SCHEMA = 1;
 const ROLE_RANK = { guest: 0, operator: 1, advanced: 2, admin: 3 };
 const pendingDeviceTokens = new Map();
