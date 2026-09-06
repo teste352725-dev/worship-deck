@@ -9,6 +9,7 @@ on:
       - package.json
       - apps/deck/**
       - apps/desktop/**
+      - apps/agent/**
       - .github/workflows/build-windows.yml
 
 permissions:
@@ -35,10 +36,22 @@ jobs:
         shell: pwsh
         run: npm run dist:win
 
-      - name: Publicar instalador
+      - name: Gerar Worship Agent
+        shell: pwsh
+        run: npm run dist:agent:win
+
+      - name: Publicar instalador do Deck
         uses: actions/upload-artifact@v4
         with:
           name: WorshipDeck-Setup-1.0.1-Windows-x64
           path: dist-desktop/*.exe
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publicar instalador do Agent
+        uses: actions/upload-artifact@v4
+        with:
+          name: WorshipAgent-Setup-1.0.1-Windows-x64
+          path: dist-agent/*.exe
           if-no-files-found: error
           retention-days: 30
