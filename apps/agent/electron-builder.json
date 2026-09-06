@@ -1,0 +1,35 @@
+{
+  "appId": "br.com.worshipdeck.agent",
+  "productName": "Worship Agent",
+  "asar": true,
+  "directories": {
+    "output": "dist-agent"
+  },
+  "extraMetadata": {
+    "main": "apps/agent/desktop-main.js"
+  },
+  "files": [
+    "apps/agent/agent.js",
+    "apps/agent/desktop-main.js",
+    "package.json",
+    "!apps/agent/agent-config.json"
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "artifactName": "WorshipAgent-Setup-${version}-${arch}.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": false,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Worship Agent",
+    "runAfterFinish": true,
+    "include": "apps/agent/installer.nsh"
+  }
+}
