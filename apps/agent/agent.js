@@ -4,8 +4,10 @@ const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
 
-const ROOT = __dirname;
-const CONFIG_FILE = path.join(ROOT, 'agent-config.json');
+const APP_ROOT = __dirname;
+const DATA_ROOT = process.env.WORSHIP_AGENT_DATA_DIR || APP_ROOT;
+const CONFIG_FILE = path.join(DATA_ROOT, 'agent-config.json');
+try { fs.mkdirSync(DATA_ROOT, { recursive: true }); } catch {}
 const PORT = 4178;
 const MULTICAST = '239.255.47.77';
 
@@ -38,7 +40,7 @@ function announce() {
     id: cfg.id,
     name: cfg.name,
     obsPort: cfg.obsPort,
-    agentVersion: '3.0-alpha.1',
+    agentVersion: '1.0.1',
   }));
   socket.send(payload, 0, payload.length, PORT, MULTICAST, () => {});
 }
