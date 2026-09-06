@@ -8,7 +8,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "desktop": "electron .",
-    "dist:win": "electron-builder --win nsis",
+    "dist:win": "electron-builder --win nsis --publish never",
     "pack:win": "electron-builder --win dir"
   },
   "devDependencies": {
