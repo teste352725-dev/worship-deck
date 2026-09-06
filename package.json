@@ -9,6 +9,7 @@
   "scripts": {
     "desktop": "electron .",
     "dist:win": "electron-builder --win nsis --publish never",
+    "dist:agent:win": "electron-builder --config apps/agent/electron-builder.json --win nsis --publish never",
     "pack:win": "electron-builder --win dir"
   },
   "devDependencies": {
