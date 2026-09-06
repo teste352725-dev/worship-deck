@@ -1,0 +1,53 @@
+{
+  "name": "worship-deck",
+  "version": "1.0.1",
+  "private": true,
+  "description": "Painel de controle para Holyrics, OBS e dispositivos da igreja.",
+  "main": "apps/desktop/main.js",
+  "author": "Worship Deck",
+  "license": "UNLICENSED",
+  "scripts": {
+    "desktop": "electron .",
+    "dist:win": "electron-builder --win nsis",
+    "pack:win": "electron-builder --win dir"
+  },
+  "devDependencies": {
+    "electron": "^37.2.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "br.com.worshipdeck.app",
+    "productName": "Worship Deck",
+    "asar": true,
+    "directories": {
+      "output": "dist-desktop"
+    },
+    "files": [
+      "apps/deck/**/*",
+      "apps/desktop/**/*",
+      "package.json",
+      "!apps/deck/config.json",
+      "!apps/deck/security-store.json",
+      "!apps/deck/backups/**/*",
+      "!apps/deck/logs/**/*",
+      "!apps/deck/profiles/*.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "WorshipDeck-Setup-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Worship Deck",
+      "runAfterFinish": true
+    }
+  }
+}
