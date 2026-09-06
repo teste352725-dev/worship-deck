@@ -947,3 +947,20 @@ html.force-mobile.mobile-tabs-hidden .mobile-view { padding-top:0 !important; }
   .mobile-panel-card,.mobile-now-card { border-color:var(--line); background:#101720; border-radius:15px; }
   .worship-security-lock { background:#111a26 !important; border-color:rgba(77,163,255,.3) !important; color:#eaf4ff !important; }
 }
+
+
+/* Correção mobile landscape: a barra reserva espaço e não cobre os controles */
+@media (pointer: coarse) and (max-width: 1180px) and (orientation: landscape) {
+  .mobile-tabs {
+    position: static;
+    top: auto;
+    left: auto;
+    transform: none;
+    align-self: center;
+    flex: 0 0 auto;
+  }
+
+  .mobile-view {
+    padding-top: 0;
+  }
+}
