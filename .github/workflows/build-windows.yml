@@ -1,0 +1,45 @@
+name: Build Worship Deck Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/unified-responsive-ui
+    paths:
+      - package.json
+      - apps/deck/**
+      - apps/desktop/**
+      - .github/workflows/build-windows.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        shell: pwsh
+        run: npm install --no-audit --no-fund
+
+      - name: Gerar instalador
+        shell: pwsh
+        run: npm run dist:win
+
+      - name: Publicar instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: WorshipDeck-Setup-1.0.1-Windows-x64
+          path: dist-desktop/*.exe
+          if-no-files-found: error
+          retention-days: 30
