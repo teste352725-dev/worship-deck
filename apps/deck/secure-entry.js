@@ -3,6 +3,10 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+function safeNetworkInterfaces() {
+  try { return os.networkInterfaces() || {}; }
+  catch { return {}; }
+}
 const http = require('http');
 const crypto = require('crypto');
 
@@ -306,7 +310,7 @@ function securityStatus(req) {
 function localPairUrls(req, code) {
   const port = Number(req.socket?.localPort || 4177);
   const found = [];
-  for (const entries of Object.values(os.networkInterfaces())) {
+  for (const entries of Object.values(safeNetworkInterfaces())) {
     for (const item of entries || []) {
       if (item.family !== 'IPv4' || item.internal) continue;
       const address = item.address;

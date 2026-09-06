@@ -11,7 +11,11 @@ const ROOT = __dirname;
 const PUBLIC = path.join(ROOT, 'public');
 const CONFIG_FILE = path.join(ROOT, 'config.json');
 const PROFILES_DIR = path.join(ROOT, 'profiles');
-const VERSION = '3.0.0-alpha.4-rc';
+const VERSION = '1.0.1';
+function safeNetworkInterfaces() {
+  try { return os.networkInterfaces() || {}; }
+  catch { return {}; }
+}
 try { fs.mkdirSync(PROFILES_DIR, { recursive: true }); } catch {}
 
 const DEFAULT_CONFIG = {
@@ -365,7 +369,7 @@ async function runDiagnostics() {
   const effective = effectiveObsConfig();
   const agents = activeAgents();
   const localAddresses = [];
-  for (const [name, entries] of Object.entries(os.networkInterfaces())) {
+  for (const [name, entries] of Object.entries(safeNetworkInterfaces())) {
     for (const item of entries || []) if (item.family === 'IPv4' && !item.internal) localAddresses.push(`${name}: ${item.address}`);
   }
 
@@ -1452,7 +1456,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url.startsWith('/api/network')) {
       const cfg = loadConfig();
       const addresses = [];
-      const nets = os.networkInterfaces();
+      const nets = safeNetworkInterfaces();
       for (const [name, entries] of Object.entries(nets)) {
         for (const item of entries || []) {
           if (item.family === 'IPv4' && !item.internal) {
@@ -1573,10 +1577,10 @@ startAgentDiscovery();
 const configAtStart = loadConfig();
 server.listen(configAtStart.deckPort, '0.0.0.0', () => {
   console.log('\n=============================================');
-  console.log('       WORSHIP DECK V3 ALPHA 4 RC');
+  console.log('          WORSHIP DECK 1.0.1');
   console.log('=============================================');
   console.log(`PC local: http://localhost:${configAtStart.deckPort}`);
-  const nets = os.networkInterfaces();
+  const nets = safeNetworkInterfaces();
   const found = [];
   for (const entries of Object.values(nets)) {
     for (const item of entries || []) {

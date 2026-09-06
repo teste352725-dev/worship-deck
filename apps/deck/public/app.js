@@ -70,37 +70,27 @@ function saveSeenFeatureTours(set) { localStorage.setItem(FEATURE_TOUR_SEEN_KEY,
 
 
 function normalizeDisplayMode(mode) {
-  if (mode === 'deck') return 'auto';
-  return ['auto','mobile','desktop'].includes(mode) ? mode : 'auto';
+  return 'auto';
 }
 
 function applyDisplayMode(mode) {
-  const next = normalizeDisplayMode(mode);
   document.documentElement.classList.remove('force-mobile','force-desktop');
-  if (next === 'mobile') document.documentElement.classList.add('force-mobile');
-  if (next === 'desktop') document.documentElement.classList.add('force-desktop');
-  localStorage.setItem('worshipDeckDisplayMode', next);
+  localStorage.setItem('worshipDeckDisplayMode', 'auto');
 }
 
 function setDisplayModeAndReload(mode) {
-  const next = normalizeDisplayMode(mode);
-  applyDisplayMode(next);
+  applyDisplayMode('auto');
   const url = new URL(location.href);
-  url.searchParams.set('mode', next === 'auto' ? 'deck' : next);
+  url.searchParams.delete('mode');
   location.replace(url.toString());
 }
 
 (function initDisplayMode() {
+  applyDisplayMode('auto');
   const params = new URLSearchParams(location.search);
-  const fromUrl = params.get('mode');
-  const saved = localStorage.getItem('worshipDeckDisplayMode') || 'auto';
-  const resolved = fromUrl === 'deck' || fromUrl === 'auto' ? 'auto' : normalizeDisplayMode(fromUrl || saved);
-  applyDisplayMode(resolved);
-
-  // A partir da Alpha 3, o antigo ?mode=auto passa a se chamar ?mode=deck.
-  if (fromUrl === 'auto') {
+  if (params.has('mode')) {
     const url = new URL(location.href);
-    url.searchParams.set('mode', 'deck');
+    url.searchParams.delete('mode');
     history.replaceState(null, '', url.toString());
   }
 })();
@@ -2489,4 +2479,3 @@ $('#testCloudBtn')?.addEventListener('click', testCloudConnection);
   $(sel)?.addEventListener('input', () => { updateMobileSettingsFromPanel(); queueMobileAutoSave(); });
   $(sel)?.addEventListener('change', () => { updateMobileSettingsFromPanel(); queueMobileAutoSave(260); });
 });
-

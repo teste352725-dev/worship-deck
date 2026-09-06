@@ -841,3 +841,109 @@ html.force-mobile.mobile-tabs-hidden .mobile-view { padding-top:0 !important; }
   .mobile-tabs, .mobile-deck-btn, .mobile-drawer > button,
   .mobile-drawer-mini-grid button, .mobile-mini-control { -webkit-tap-highlight-color:transparent; }
 }
+
+/* ========================================================================== */
+/* Worship Deck 1.0.1 — interface unificada e responsiva                      */
+/* ========================================================================== */
+:root {
+  --bg:#070a0f;
+  --panel:#10151d;
+  --panel-2:#151c27;
+  --line:rgba(151,167,190,.14);
+  --text:#f5f7fb;
+  --muted:#8994a6;
+  --accent:#4da3ff;
+  --accent-soft:rgba(77,163,255,.13);
+  --green:#3ddc97;
+  --red:#ff5f6d;
+  --sidebar:#0b1017;
+}
+
+@media (pointer:fine), (min-width:1181px) {
+  html,body { height:100%; overflow:hidden; background:#070a0f; }
+  .desktop-shell {
+    width:100%; height:100vh; margin:0; padding:0; gap:0;
+    display:grid; grid-template-columns:248px minmax(0,1fr);
+  }
+  .desktop-sidebar {
+    min-width:0; display:flex; flex-direction:column; padding:20px 14px 16px;
+    background:linear-gradient(180deg,#0d131c 0%,#090d13 100%);
+    border-right:1px solid var(--line);
+  }
+  .desktop-brand { display:flex; align-items:center; gap:11px; padding:2px 8px 22px; }
+  .desktop-brand-mark {
+    width:38px; height:38px; flex:none; display:grid; place-items:center;
+    border-radius:12px; background:linear-gradient(145deg,#5daeff,#276dcc);
+    color:#fff; font-weight:950; box-shadow:0 10px 24px rgba(31,111,218,.28);
+  }
+  .desktop-brand strong,.desktop-brand small { display:block; }
+  .desktop-brand strong { font-size:.94rem; letter-spacing:-.02em; }
+  .desktop-brand small { margin-top:3px; color:#66758a; font-size:.58rem; font-weight:900; letter-spacing:.13em; }
+  .desktop-nav { display:grid; gap:5px; }
+  .desktop-nav button {
+    width:100%; min-height:46px; display:grid; grid-template-columns:30px 1fr; align-items:center;
+    padding:0 12px; border:1px solid transparent; border-radius:11px;
+    background:transparent; color:#8490a3; text-align:left; cursor:pointer;
+  }
+  .desktop-nav button span { font-size:1rem; text-align:center; }
+  .desktop-nav button b { font-size:.79rem; letter-spacing:.01em; }
+  .desktop-nav button:hover { color:#dce5f2; background:rgba(255,255,255,.035); }
+  .desktop-nav button.active { color:#f7fbff; background:var(--accent-soft); border-color:rgba(77,163,255,.2); }
+  .desktop-nav button.active span { color:#75b8ff; }
+  .desktop-nav .nav-obs-dot { color:var(--red); font-size:.72rem; }
+  .desktop-sidebar-status {
+    margin-top:auto; display:grid; gap:9px; padding:14px 12px 4px;
+    border-top:1px solid var(--line); color:#718095; font-size:.68rem; font-weight:800;
+  }
+  .desktop-sidebar-status span { display:flex; align-items:center; gap:8px; }
+  .sidebar-dot { width:7px; height:7px; border-radius:50%; background:#3b4655; }
+  .sidebar-dot.online { background:var(--green); box-shadow:0 0 10px rgba(61,220,151,.65); }
+  .desktop-workspace { min-width:0; height:100vh; overflow:auto; padding:22px clamp(22px,3vw,42px) 26px; }
+  .topbar { position:sticky; top:-22px; z-index:20; margin:-22px 0 24px; padding:22px 0 15px; background:rgba(7,10,15,.92); backdrop-filter:blur(18px); border-bottom:1px solid rgba(151,167,190,.08); }
+  .topbar .eyebrow { color:#748198; font-size:.67rem; letter-spacing:.04em; text-transform:none; }
+  .topbar h1 { margin:.12rem 0 0; font-size:1.55rem; }
+  .desktop-page { display:none !important; animation:wdPageIn .18s ease; }
+  .desktop-page.active { display:grid !important; }
+  .monitor-grid.desktop-page.active { grid-template-columns:minmax(310px,.8fr) minmax(480px,1.2fr) !important; }
+  .desktop-page.active + .desktop-page { margin-top:0; }
+  .desktop-section { max-width:1320px; margin:0 auto; }
+  .monitor-grid { max-width:1320px; margin:0 auto; }
+  .deck-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .deck-btn { min-height:164px; }
+  .deck-btn.wide { grid-column:1/-1; }
+  .devices-page > #worshipSecurityAdminPanel { display:grid; margin-top:2px; }
+  .devices-page #worshipSecurityAdminPanel > .worship-security-row:first-child { display:none; }
+  footer { max-width:1320px; margin:28px auto 0; }
+}
+
+@keyframes wdPageIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+
+@media (max-width:1180px) and (pointer:coarse) {
+  html,body { background:#070a0f; }
+  .mobile-shell { gap:0; padding:0; background:linear-gradient(180deg,#0a0f16,#070a0f); }
+  .mobile-menu-btn {
+    top:max(10px,env(safe-area-inset-top)); left:max(10px,env(safe-area-inset-left));
+    width:42px; height:42px; border-radius:13px; background:rgba(15,21,30,.94);
+    border:1px solid rgba(151,167,190,.16); box-shadow:0 8px 22px rgba(0,0,0,.3);
+  }
+  .mobile-tabs {
+    order:3; z-index:40; grid-template-columns:repeat(3,1fr); gap:4px;
+    padding:7px max(8px,env(safe-area-inset-right)) max(7px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
+    background:rgba(9,13,19,.96); border-top:1px solid var(--line); backdrop-filter:blur(18px);
+  }
+  .mobile-tab { min-height:48px; border:0; border-radius:10px; background:transparent; color:#748095; }
+  .mobile-tab.active { color:#fff; background:rgba(77,163,255,.14); border:0; }
+  .mobile-view { padding:9px; }
+  .mobile-deck-page { gap:7px; }
+  .mobile-deck-btn {
+    border-radius:14px; background:#111822; border-color:rgba(151,167,190,.14);
+    box-shadow:0 7px 16px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025);
+  }
+  .mobile-deck-btn.nav { background:#102139; border-color:rgba(77,163,255,.28); }
+  .mobile-deck-btn.success { background:#10261f; border-color:rgba(61,220,151,.26); }
+  .mobile-deck-btn.danger { background:#281318; border-color:rgba(255,95,109,.25); }
+  .mobile-drawer { background:#0c121b; border-right:1px solid var(--line); box-shadow:24px 0 60px rgba(0,0,0,.5); }
+  .mobile-drawer-brand span { color:#68768a; }
+  .mobile-panel-card,.mobile-now-card { border-color:var(--line); background:#101720; border-radius:15px; }
+  .worship-security-lock { background:#111a26 !important; border-color:rgba(77,163,255,.3) !important; color:#eaf4ff !important; }
+}

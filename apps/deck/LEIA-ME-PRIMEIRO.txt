@@ -1,7 +1,7 @@
-WORSHIP DECK V3 ALPHA 4 RC - PACOTE COMPLETO
-=============================================
+WORSHIP DECK 1.0.1 - PACOTE DE TESTE
+=====================================
 
-Este pacote e uma instalacao COMPLETA/PORTATIL do Worship Deck V3.
+Este pacote e uma instalacao COMPLETA/PORTATIL do Worship Deck 1.0.1.
 Ele NAO e apenas um UPDATE.
 
 REQUISITO ATUAL
