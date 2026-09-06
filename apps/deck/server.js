@@ -7,10 +7,12 @@ const dgram = require('dgram');
 const https = require('https');
 const crypto = require('crypto');
 
-const ROOT = __dirname;
-const PUBLIC = path.join(ROOT, 'public');
-const CONFIG_FILE = path.join(ROOT, 'config.json');
-const PROFILES_DIR = path.join(ROOT, 'profiles');
+const APP_ROOT = __dirname;
+const DATA_ROOT = process.env.WORSHIP_DECK_DATA_DIR || APP_ROOT;
+const PUBLIC = path.join(APP_ROOT, 'public');
+const CONFIG_FILE = path.join(DATA_ROOT, 'config.json');
+const PROFILES_DIR = path.join(DATA_ROOT, 'profiles');
+try { fs.mkdirSync(DATA_ROOT, { recursive: true }); } catch {}
 const VERSION = '1.0.1';
 function safeNetworkInterfaces() {
   try { return os.networkInterfaces() || {}; }
@@ -65,9 +67,9 @@ const DEFAULT_CONFIG = {
 function bootstrapRuntime() {
   const dirs = [
     PROFILES_DIR,
-    path.join(ROOT, 'backups'),
-    path.join(ROOT, 'plugins'),
-    path.join(ROOT, 'logs'),
+    path.join(DATA_ROOT, 'backups'),
+    path.join(DATA_ROOT, 'plugins'),
+    path.join(DATA_ROOT, 'logs'),
   ];
   for (const dir of dirs) {
     try { fs.mkdirSync(dir, { recursive: true }); } catch {}
