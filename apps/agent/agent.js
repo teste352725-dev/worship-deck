@@ -40,7 +40,7 @@ function announce() {
     id: cfg.id,
     name: cfg.name,
     obsPort: cfg.obsPort,
-    agentVersion: '1.0.1',
+    agentVersion: '1.0.2',
   }));
   socket.send(payload, 0, payload.length, PORT, MULTICAST, () => {});
 }
