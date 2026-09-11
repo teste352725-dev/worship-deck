@@ -1,0 +1,43 @@
+name: Publicar atualização do Worship Deck
+
+on:
+  push:
+    branches:
+      - feat/unified-responsive-ui
+
+permissions:
+  contents: write
+
+jobs:
+  release-windows:
+    if: contains(github.event.head_commit.message, '[release]')
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependências
+        shell: pwsh
+        run: npm install --no-audit --no-fund
+
+      - name: Gerar e publicar atualização
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --win nsis --publish always
+
+      - name: Guardar instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: WorshipDeck-Update-Windows-x64
+          path: |
+            dist-desktop/*.exe
+            dist-desktop/latest.yml
+          if-no-files-found: error
+          retention-days: 30
