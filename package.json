@@ -37,7 +37,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "artifactName": "WorshipDeck-Setup-${version}-${arch}.${ext}"
@@ -49,6 +51,17 @@
       "createStartMenuShortcut": true,
       "shortcutName": "Worship Deck",
       "runAfterFinish": true
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "teste352725-dev",
+        "repo": "worship-deck",
+        "releaseType": "release"
+      }
+    ]
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2"
   }
 }
