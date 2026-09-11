@@ -13,7 +13,7 @@ const PUBLIC = path.join(APP_ROOT, 'public');
 const CONFIG_FILE = path.join(DATA_ROOT, 'config.json');
 const PROFILES_DIR = path.join(DATA_ROOT, 'profiles');
 try { fs.mkdirSync(DATA_ROOT, { recursive: true }); } catch {}
-const VERSION = '1.0.1';
+const VERSION = '1.0.2';
 function safeNetworkInterfaces() {
   try { return os.networkInterfaces() || {}; }
   catch { return {}; }
@@ -1579,7 +1579,7 @@ startAgentDiscovery();
 const configAtStart = loadConfig();
 server.listen(configAtStart.deckPort, '0.0.0.0', () => {
   console.log('\n=============================================');
-  console.log('          WORSHIP DECK 1.0.1');
+  console.log('          WORSHIP DECK 1.0.2');
   console.log('=============================================');
   console.log(`PC local: http://localhost:${configAtStart.deckPort}`);
   const nets = safeNetworkInterfaces();
