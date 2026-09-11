@@ -34,8 +34,13 @@ jobs:
           $version = node -p "require('./package.json').version"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag "v$version"
-          git push origin "v$version"
+          git ls-remote --exit-code --tags origin "refs/tags/v$version"
+          if ($LASTEXITCODE -ne 0) {
+            git tag "v$version"
+            git push origin "v$version"
+          } else {
+            Write-Host "A etiqueta v$version já existe."
+          }
 
       - name: Gerar e publicar atualização
         shell: pwsh
