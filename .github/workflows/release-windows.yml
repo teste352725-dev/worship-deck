@@ -26,6 +26,17 @@ jobs:
         shell: pwsh
         run: npm install --no-audit --no-fund
 
+      - name: Criar etiqueta da versão
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $version = node -p "require('./package.json').version"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "v$version"
+          git push origin "v$version"
+
       - name: Gerar e publicar atualização
         shell: pwsh
         env:
