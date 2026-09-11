@@ -1,6 +1,6 @@
 {
   "name": "worship-deck",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "Painel de controle para Holyrics, OBS e dispositivos da igreja.",
   "main": "apps/desktop/main.js",
