@@ -1,6 +1,6 @@
 @echo off
 cd /d "%~dp0"
-title Worship Deck 1.0.1
+title Worship Deck 1.0.2
 where node >nul 2>nul
 if errorlevel 1 (
   echo.
