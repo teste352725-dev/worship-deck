@@ -1,6 +1,7 @@
 'use strict';
 
 const { app, BrowserWindow, Menu, Tray, shell, dialog, nativeImage } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
@@ -14,6 +15,10 @@ let tray = null;
 let deckPort = DEFAULT_PORT;
 let isQuitting = false;
 let closeHintShown = false;
+let manualUpdateCheck = false;
+let updateState = 'idle';
+let updateVersion = '';
+let updateProgress = 0;
 
 app.setName(APP_NAME);
 app.setAppUserModelId('br.com.worshipdeck.app');
@@ -58,15 +63,61 @@ function showWindow() {
   mainWindow.focus();
 }
 
-function createTray() {
-  const icon = nativeImage.createFromBuffer(Buffer.from(ICON_BASE64, 'base64'));
-  tray = new Tray(icon);
-  tray.setToolTip(`${APP_NAME} — ativo na porta ${deckPort}`);
+function showTrayMessage(title, content) {
+  try { tray?.displayBalloon({ title, content }); } catch {}
+}
+
+function checkForUpdates(manual = false) {
+  if (!app.isPackaged || updateState === 'checking' || updateState === 'downloading') return;
+  manualUpdateCheck = manual;
+  updateState = 'checking';
+  rebuildTrayMenu();
+  autoUpdater.checkForUpdates().catch(error => {
+    updateState = 'idle';
+    rebuildTrayMenu();
+    if (manual) dialog.showMessageBox({ type:'warning', title:'Atualizações', message:'Não foi possível verificar atualizações.', detail:error.message });
+  });
+}
+
+function rebuildTrayMenu() {
+  if (!tray) return;
+  const updateItems = [];
+  if (updateState === 'available') {
+    updateItems.push({
+      label:`Baixar atualização ${updateVersion}`,
+      click:() => {
+        updateState = 'downloading';
+        updateProgress = 0;
+        rebuildTrayMenu();
+        autoUpdater.downloadUpdate().catch(error => {
+          updateState = 'available';
+          rebuildTrayMenu();
+          dialog.showMessageBox({ type:'warning', title:'Atualizações', message:'Não foi possível baixar a atualização.', detail:error.message });
+        });
+      }
+    });
+  } else if (updateState === 'downloading') {
+    updateItems.push({ label:`Baixando atualização… ${updateProgress}%`, enabled:false });
+  } else if (updateState === 'downloaded') {
+    updateItems.push({
+      label:`Instalar ${updateVersion} e reiniciar`,
+      click:() => {
+        isQuitting = true;
+        autoUpdater.quitAndInstall(false, true);
+      }
+    });
+  } else if (updateState === 'checking') {
+    updateItems.push({ label:'Verificando atualizações…', enabled:false });
+  } else {
+    updateItems.push({ label:'Verificar atualizações', click:() => checkForUpdates(true) });
+  }
+
   tray.setContextMenu(Menu.buildFromTemplate([
-    { label:'Worship Deck ativo', enabled:false },
+    { label:`Worship Deck ${app.getVersion()} ativo`, enabled:false },
     { label:`Celular: porta ${deckPort}`, enabled:false },
     { type:'separator' },
     { label:'Abrir Worship Deck', click:showWindow },
+    ...updateItems,
     { label:'Inicia silenciosamente com o Windows', enabled:false },
     { type:'separator' },
     {
@@ -77,7 +128,14 @@ function createTray() {
       }
     }
   ]));
+}
+
+function createTray() {
+  const icon = nativeImage.createFromBuffer(Buffer.from(ICON_BASE64, 'base64'));
+  tray = new Tray(icon);
+  tray.setToolTip(`${APP_NAME} ${app.getVersion()} — ativo na porta ${deckPort}`);
   tray.on('double-click', showWindow);
+  rebuildTrayMenu();
 }
 
 function configureSilentStartup() {
@@ -86,46 +144,70 @@ function configureSilentStartup() {
     const legacyShortcut = path.join(app.getPath('appData'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup', 'Worship Deck.lnk');
     if (fs.existsSync(legacyShortcut)) fs.unlinkSync(legacyShortcut);
   } catch {}
-  app.setLoginItemSettings({
-    openAtLogin:true,
-    path:process.execPath,
-    args:['--background']
+  app.setLoginItemSettings({ openAtLogin:true, path:process.execPath, args:['--background'] });
+}
+
+function configureUpdates() {
+  if (!app.isPackaged) return;
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.on('update-available', info => {
+    updateState = 'available';
+    updateVersion = info.version || 'nova versão';
+    rebuildTrayMenu();
+    showTrayMessage('Atualização disponível', `A versão ${updateVersion} está disponível. Abra o menu do Worship Deck para baixar quando for conveniente.`);
   });
+  autoUpdater.on('update-not-available', () => {
+    updateState = 'idle';
+    rebuildTrayMenu();
+    if (manualUpdateCheck) showTrayMessage('Worship Deck atualizado', 'Você já está usando a versão mais recente.');
+    manualUpdateCheck = false;
+  });
+  autoUpdater.on('download-progress', progress => {
+    updateState = 'downloading';
+    updateProgress = Math.max(0, Math.min(100, Math.round(progress.percent || 0)));
+    rebuildTrayMenu();
+  });
+  autoUpdater.on('update-downloaded', info => {
+    updateState = 'downloaded';
+    updateVersion = info.version || updateVersion || 'nova versão';
+    rebuildTrayMenu();
+    showTrayMessage('Atualização pronta', `A versão ${updateVersion} foi baixada. Escolha “Instalar e reiniciar” no menu quando o culto permitir.`);
+  });
+  autoUpdater.on('error', error => {
+    const wasManual = manualUpdateCheck;
+    manualUpdateCheck = false;
+    if (updateState !== 'available') updateState = 'idle';
+    rebuildTrayMenu();
+    if (wasManual) dialog.showMessageBox({ type:'warning', title:'Atualizações', message:'Não foi possível verificar atualizações.', detail:error.message });
+  });
+  setTimeout(() => checkForUpdates(false), 12000);
+  setInterval(() => checkForUpdates(false), 6 * 60 * 60 * 1000);
 }
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    title: APP_NAME,
-    width: 1440,
-    height: 900,
-    minWidth: 980,
-    minHeight: 640,
-    backgroundColor: '#090b10',
+    title:APP_NAME,
+    width:1440,
+    height:900,
+    minWidth:980,
+    minHeight:640,
+    backgroundColor:'#090b10',
     show:false,
     autoHideMenuBar:true,
-    webPreferences: {
-      nodeIntegration:false,
-      contextIsolation:true,
-      sandbox:true,
-      devTools:true
-    }
+    webPreferences:{ nodeIntegration:false, contextIsolation:true, sandbox:true, devTools:true }
   });
 
   Menu.setApplicationMenu(null);
   mainWindow.loadURL(`http://127.0.0.1:${deckPort}/`);
-  mainWindow.once('ready-to-show', () => {
-    if (!startHidden) showWindow();
-  });
+  mainWindow.once('ready-to-show', () => { if (!startHidden) showWindow(); });
   mainWindow.on('close', event => {
     if (isQuitting) return;
     event.preventDefault();
     mainWindow.hide();
     if (!closeHintShown && tray) {
       closeHintShown = true;
-      tray.displayBalloon({
-        title:'Worship Deck continua ativo',
-        content:'A janela foi ocultada. O celular continua funcionando. Dê dois cliques no ícone para abrir novamente.'
-      });
+      showTrayMessage('Worship Deck continua ativo', 'A janela foi ocultada. O celular continua funcionando. Dê dois cliques no ícone para abrir novamente.');
     }
   });
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -158,6 +240,7 @@ if (!singleInstance) {
       await waitForDeck(deckPort);
       createTray();
       createWindow();
+      configureUpdates();
     } catch (error) {
       dialog.showErrorBox(APP_NAME, `Não foi possível iniciar o Worship Deck.\n\n${error.message}`);
       isQuitting = true;
