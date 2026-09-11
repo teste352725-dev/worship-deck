@@ -2,7 +2,7 @@
 
 Painel de controle para operação de culto com integração entre **Holyrics**, **OBS Studio**, celulares/tablets e controle Web.
 
-> Estado atual: **1.0.1** — primeira versão da interface unificada e responsiva, ainda em teste antes dos instaladores desktop e APK.
+> Estado atual: **1.0.2** — primeira versão da interface unificada e responsiva, ainda em teste antes dos instaladores desktop e APK.
 
 ## Estrutura
 
