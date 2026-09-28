@@ -1,0 +1,48 @@
+name: Build Worship Deck Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/android-apk
+    paths:
+      - apps/android/**
+      - apps/deck/server.js
+      - .github/workflows/build-android.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
+      - name: Compilar APK
+        working-directory: apps/android
+        run: gradle assembleDebug --no-daemon
+
+      - name: Renomear APK
+        run: cp apps/android/app/build/outputs/apk/debug/app-debug.apk WorshipDeck-Android-1.0.0.apk
+
+      - name: Publicar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WorshipDeck-Android-1.0.0
+          path: WorshipDeck-Android-1.0.0.apk
+          if-no-files-found: error
+          retention-days: 30
