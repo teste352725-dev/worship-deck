@@ -21,7 +21,3 @@ android {
 
     packaging { resources { excludes += ["/META-INF/{AL2.0,LGPL2.1}"] } }
 }
-
-dependencies {
-    implementation "androidx.appcompat:appcompat:1.7.0"
-}
