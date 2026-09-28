@@ -955,7 +955,7 @@ async function getObsScreenshot({ sourceName, width = 640, height = 360, quality
   width = clampNumber(width, 8, 1280, 640);
   height = clampNumber(height, 8, 720, 360);
   quality = clampNumber(quality, 10, 90, 55);
-  ttlMs = clampNumber(ttlMs, 300, 15000, 4000);
+  ttlMs = clampNumber(ttlMs, 80, 15000, 4000);
 
   const key = `${sourceName}|${width}x${height}|q${quality}`;
   const cached = obsScreenshotCache.get(key);
@@ -1566,6 +1566,36 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { status: 'ok', ...automationSnapshot() });
     }
 
+
+    if (req.method === 'GET' && req.url.startsWith('/api/obs/live.mjpg')) {
+      const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+      const requestedScene = String(url.searchParams.get('sceneName') || '').trim();
+      let closed = false;
+      req.on('close', () => { closed = true; });
+      res.writeHead(200, {
+        'Content-Type': 'multipart/x-mixed-replace; boundary=worshipdeck',
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Connection': 'keep-alive',
+        'X-Content-Type-Options': 'nosniff',
+      });
+      while (!closed && !res.destroyed) {
+        try {
+          const state = await getObsState();
+          const sceneName = requestedScene || state.currentProgramSceneName;
+          if (!sceneName) throw new Error('OBS sem cena no ar.');
+          const image = await getObsScreenshot({
+            sourceName: sceneName, width: 640, height: 360, quality: 52, ttlMs: 120,
+          });
+          res.write(`--worshipdeck\r\nContent-Type: ${image.mime || 'image/jpeg'}\r\nContent-Length: ${image.buffer.length}\r\n\r\n`);
+          res.write(image.buffer);
+          res.write('\r\n');
+        } catch (error) {
+          if (!closed) await new Promise(resolve => setTimeout(resolve, 600));
+        }
+        if (!closed) await new Promise(resolve => setTimeout(resolve, 140));
+      }
+      return;
+    }
 
     if (req.method === 'GET' && req.url.startsWith('/api/obs/screenshot')) {
       const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
