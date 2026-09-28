@@ -523,6 +523,39 @@ async function runControl(body) {
 
 
 // -----------------------------------------------------------------------------
+// Worship Deck discovery for the Android app. Only the local service port and
+// version are announced; credentials and integration secrets never leave disk.
+// -----------------------------------------------------------------------------
+const DECK_DISCOVERY_PORT = 4179;
+let deckDiscoverySocket = null;
+
+function startDeckDiscovery() {
+  try {
+    deckDiscoverySocket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
+    deckDiscoverySocket.on('message', (message, rinfo) => {
+      if (message.toString('utf8').trim() !== 'WORSHIP_DECK_DISCOVER_V1') return;
+      const cfg = loadConfig();
+      const response = Buffer.from(JSON.stringify({
+        type: 'worship-deck-v1',
+        name: 'Worship Deck',
+        version: VERSION,
+        port: Number(cfg.deckPort || 4177),
+      }), 'utf8');
+      deckDiscoverySocket.send(response, rinfo.port, rinfo.address);
+    });
+    deckDiscoverySocket.on('error', () => {
+      try { deckDiscoverySocket.close(); } catch {}
+      deckDiscoverySocket = null;
+    });
+    deckDiscoverySocket.bind(DECK_DISCOVERY_PORT, '0.0.0.0', () => {
+      try { deckDiscoverySocket.setBroadcast(true); } catch {}
+    });
+  } catch {
+    deckDiscoverySocket = null;
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Worship Agent discovery (LAN). The Agent only announces its identity and OBS
 // WebSocket port. Passwords/tokens are never broadcast.
 // -----------------------------------------------------------------------------
@@ -1582,6 +1615,7 @@ setInterval(() => pushCloudState(), 1400);
 setTimeout(() => { pullCloudCommands(); pushCloudState(); }, 1200);
 
 startAgentDiscovery();
+startDeckDiscovery();
 const configAtStart = loadConfig();
 server.listen(configAtStart.deckPort, '0.0.0.0', () => {
   console.log('\n=============================================');
