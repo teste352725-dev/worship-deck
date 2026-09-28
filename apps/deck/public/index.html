@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#090b10" />
-  <title>Worship Deck 1.0.1 • Holyrics + OBS</title>
+  <title>Worship Deck 1.0.3 • Holyrics + OBS</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -12,7 +12,7 @@
     <aside class="desktop-sidebar" aria-label="Navegação principal">
       <div class="desktop-brand">
         <span class="desktop-brand-mark">W</span>
-        <span><strong>Worship Deck</strong><small>VERSÃO 1.0.1</small></span>
+        <span><strong>Worship Deck</strong><small>VERSÃO 1.0.3</small></span>
       </div>
       <nav class="desktop-nav">
         <button class="active" type="button" data-desktop-nav="home"><span>⌂</span><b>Início</b></button>
@@ -117,6 +117,10 @@
           </div>
           <p class="preview-note">Captura leve da cena que está no ar. As miniaturas abaixo atualizam em intervalos maiores para não pesar no OBS.</p>
         </div>
+      </div>
+      <div class="camera-quick-panel">
+        <div class="camera-quick-head"><span>ACESSO RÁPIDO</span><strong>Câmeras do culto</strong></div>
+        <div id="quickCameraControls" class="camera-quick-grid" aria-label="Troca manual de câmeras"></div>
       </div>
       <div id="desktopObsScenes" class="obs-scenes-grid"><div class="empty-card">Conectando ao OBS…</div></div>
       <div id="obsError" class="inline-warning hidden"></div>
@@ -237,7 +241,7 @@
       </div>
     </section>
 
-    <footer><span>Worship Deck 1.0.1</span><span id="lastUpdate">Aguardando conexão</span></footer>
+    <footer><span>Worship Deck 1.0.3</span><span id="lastUpdate">Aguardando conexão</span></footer>
     </div>
   </main>
 
@@ -245,7 +249,7 @@
     <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Abrir menu">☰</button>
     <div id="mobileDrawerBackdrop" class="mobile-drawer-backdrop"></div>
     <aside id="mobileDrawer" class="mobile-drawer" aria-label="Menu Worship Deck">
-      <div class="mobile-drawer-brand"><strong>Worship Deck</strong><span>VERSÃO 1.0.1</span></div>
+      <div class="mobile-drawer-brand"><strong>Worship Deck</strong><span>VERSÃO 1.0.3</span></div>
       <button data-mobile-nav="controls">▦ <span>Quick Deck</span></button>
       <button data-mobile-nav="now">◫ <span>Agora / Letras</span></button>
       <button data-mobile-nav="favorites">★ <span>Favoritos</span></button>
@@ -289,6 +293,7 @@
     </section>
 
     <section id="mobileObsView" class="mobile-view">
+      <div id="mobileQuickCameraControls" class="mobile-camera-quick" aria-label="Troca manual de câmeras"></div>
       <div id="mobileObsPager" class="mobile-pager" aria-label="Cenas do OBS"></div>
       <div id="mobileObsDots" class="mobile-dots" aria-hidden="true"></div>
     </section>
@@ -494,6 +499,10 @@
       <label>Worship Agent encontrado<select id="obsAgentSelect"><option value="">Automático — primeiro Agent disponível</option></select></label>
       <div class="agent-row"><span id="obsAgentStatus">Nenhum Agent detectado.</span><button type="button" id="refreshAgentsBtn" class="secondary small">PROCURAR</button></div>
       <p class="form-note">Sem Agent, o IP manual continua funcionando. Com o Worship Agent no PC da live, o Deck acompanha mudanças de IP automaticamente. Nenhuma senha do OBS é anunciada na rede.</p>
+      <div class="settings-divider"><span>CÂMERAS DO CULTO</span></div>
+      <p class="form-note">Associe cada botão à cena correspondente do OBS. A troca será sempre manual.</p>
+      <label>Câmera próxima ao púlpito (diagonal)<select id="cameraPulpitSceneInput"><option value="">Escolha uma cena do OBS</option></select></label>
+      <label>Câmera alta da frente<select id="cameraFrontSceneInput"><option value="">Escolha uma cena do OBS</option></select></label>
 
       <div class="settings-divider"><span>WORSHIP DECK WEB</span></div>
       <label class="toggle-row"><input id="cloudEnabledInput" type="checkbox" /><span>Conectar este PC ao Worship Deck Web</span></label>
