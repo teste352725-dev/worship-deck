@@ -994,3 +994,14 @@ html.force-mobile.mobile-tabs-hidden .mobile-view { padding-top:0 !important; }
   .mobile-camera-quick .camera-quick-btn { min-height:48px; padding:5px 8px; }
   .mobile-camera-quick .camera-quick-copy { gap:1px; }
 }
+
+
+/* Android safe video monitor — OBS MJPEG de baixa latência */
+.mobile-obs-live { position:relative; flex:0 0 auto; margin:6px 10px 2px; height:clamp(118px,24vh,210px); overflow:hidden; border:1px solid rgba(117,224,167,.35); border-radius:14px; background:#05070a; }
+.mobile-obs-live img { width:100%; height:100%; display:block; object-fit:contain; background:#000; }
+.mobile-obs-live > span { position:absolute; left:8px; right:8px; bottom:7px; display:flex; justify-content:space-between; gap:8px; padding:5px 8px; border-radius:8px; background:rgba(5,8,12,.76); color:#dfe6f0; font-size:.67rem; overflow:hidden; white-space:nowrap; }
+.mobile-obs-live > span b { color:var(--green); }
+.mobile-obs-live-empty { height:100%; display:grid; place-items:center; color:var(--muted); font-size:.76rem; }
+@media (orientation:landscape) and (max-height:600px) {
+  .mobile-obs-live { height:82px; margin-top:3px; }
+}
