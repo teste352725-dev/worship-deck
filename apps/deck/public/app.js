@@ -11,6 +11,7 @@ let obsPasswordConfigured = false;
 let favorites = [];
 let favoriteError = '';
 let obsState = { connected: false, scenes: [], currentProgramSceneName: null, error: '' };
+let cameraConfig = { pulpitScene: '', frontScene: '' };
 let previewConfig = { pluginHost: '127.0.0.1', pluginPort: 2026, previewMode: 'widescreen' };
 let automationConfig = { enabled: false, songScene: '', verseScene: '', noneScene: '', favoriteSceneMap: {}, state: {} };
 let automationEditorDirty = false;
@@ -407,6 +408,8 @@ function renderObsState(data) {
     text.textContent = 'OBS desconectado';
     mobileDots.forEach(dot => dot.classList.remove('online'));
   }
+  renderCameraSelectors();
+  renderQuickCameras();
   renderDesktopObs();
   renderMobileObs();
   if (!mobileLayoutDirty) renderMobileStyleEditors();
@@ -414,6 +417,61 @@ function renderObsState(data) {
   renderMobilePanelStatus();
   renderMobilePanelDirector();
   updateObsProgramPreview(true);
+}
+
+
+function cameraSceneOptions(selected = '') {
+  const options = ['<option value="">Escolha uma cena do OBS</option>'];
+  for (const scene of obsState.scenes || []) {
+    const name = String(scene.sceneName || '');
+    options.push(`<option value="${escapeHtml(name)}"${name === selected ? ' selected' : ''}>${escapeHtml(name)}</option>`);
+  }
+  if (selected && !(obsState.scenes || []).some(scene => scene.sceneName === selected)) {
+    options.push(`<option value="${escapeHtml(selected)}" selected>${escapeHtml(selected)} (não encontrada)</option>`);
+  }
+  return options.join('');
+}
+
+function renderCameraSelectors() {
+  const fields = [
+    ['#cameraPulpitSceneInput', cameraConfig.pulpitScene],
+    ['#cameraFrontSceneInput', cameraConfig.frontScene],
+  ];
+  for (const [selector, selected] of fields) {
+    const input = $(selector);
+    if (!input || document.activeElement === input) continue;
+    input.innerHTML = cameraSceneOptions(selected);
+    input.value = selected || '';
+  }
+}
+
+function cameraQuickButton(label, icon, sceneName, mobile = false) {
+  const scene = (obsState.scenes || []).find(item => item.sceneName === sceneName);
+  const active = Boolean(sceneName && sceneName === obsState.currentProgramSceneName);
+  const unavailable = !obsState.connected || !sceneName || !scene;
+  const subtitle = !sceneName ? 'Configure a cena' : (!scene ? 'Cena não encontrada' : (active ? 'NO AR' : sceneName));
+  return `<button type="button" class="camera-quick-btn${mobile ? ' mobile' : ''}${active ? ' active' : ''}" ${unavailable ? 'disabled' : ''} data-obs-scene="${escapeHtml(sceneName || '')}" data-obs-uuid="${escapeHtml(scene?.sceneUuid || '')}">
+    <span class="camera-quick-icon">${icon}</span>
+    <span class="camera-quick-copy"><strong>${escapeHtml(label)}</strong><small>${escapeHtml(subtitle)}</small></span>
+    <span class="camera-live-dot" aria-hidden="true"></span>
+  </button>`;
+}
+
+function renderQuickCameras() {
+  const buttons = (mobile = false) => [
+    cameraQuickButton('Câmera Púlpito', '◩', cameraConfig.pulpitScene, mobile),
+    cameraQuickButton('Câmera Frente', '▣', cameraConfig.frontScene, mobile),
+  ].join('');
+  const desktop = $('#quickCameraControls');
+  if (desktop) {
+    desktop.innerHTML = buttons(false);
+    bindObsButtons(desktop);
+  }
+  const mobile = $('#mobileQuickCameraControls');
+  if (mobile) {
+    mobile.innerHTML = buttons(true);
+    bindObsButtons(mobile);
+  }
 }
 
 function renderDesktopObs() {
@@ -884,6 +942,9 @@ async function loadConfig() {
   $('#cloudEnabledInput').checked = Boolean(cfg.cloudEnabled);
   $('#cloudBaseUrlInput').value = cfg.cloudBaseUrl || '';
   $('#obsAutoDiscoverInput').checked = Boolean(cfg.obsAutoDiscover);
+  cameraConfig = { pulpitScene: cfg.cameraPulpitScene || '', frontScene: cfg.cameraFrontScene || '' };
+  renderCameraSelectors();
+  renderQuickCameras();
   mobileSettings = {
     theme: cfg.mobileTheme || 'dark',
     portraitCols: Number(cfg.mobilePortraitCols || 2), portraitRows: Number(cfg.mobilePortraitRows || 3),
@@ -998,6 +1059,8 @@ async function saveConfig(closeAfter = true) {
     obsPort: Number($('#obsPortInput').value || 4455),
     obsAutoDiscover: Boolean($('#obsAutoDiscoverInput').checked),
     obsAgentId: $('#obsAgentSelect').value || '',
+    cameraPulpitScene: $('#cameraPulpitSceneInput')?.value || '',
+    cameraFrontScene: $('#cameraFrontSceneInput')?.value || '',
     cloudEnabled: Boolean($('#cloudEnabledInput').checked),
     cloudBaseUrl: $('#cloudBaseUrlInput').value.trim().replace(/\/$/, ''),
   };
@@ -1016,6 +1079,9 @@ async function saveConfig(closeAfter = true) {
   currentConfigSnapshot = data || {};
   tokenConfigured = data.tokenConfigured;
   obsPasswordConfigured = data.obsPasswordConfigured;
+  cameraConfig = { pulpitScene: data.cameraPulpitScene || payload.cameraPulpitScene || '', frontScene: data.cameraFrontScene || payload.cameraFrontScene || '' };
+  renderCameraSelectors();
+  renderQuickCameras();
   syncMobileConnectionInputs(data);
   previewConfig = { pluginHost: data.pluginHost || payload.pluginHost || '127.0.0.1', pluginPort: Number(data.pluginPort || payload.pluginPort || 2026), previewMode: data.previewMode || payload.previewMode || 'widescreen' };
   await fetchAgents(false, data.obsAgentId || payload.obsAgentId || '');
