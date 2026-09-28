@@ -13,7 +13,7 @@ const PUBLIC = path.join(APP_ROOT, 'public');
 const CONFIG_FILE = path.join(DATA_ROOT, 'config.json');
 const PROFILES_DIR = path.join(DATA_ROOT, 'profiles');
 try { fs.mkdirSync(DATA_ROOT, { recursive: true }); } catch {}
-const VERSION = '1.0.4';
+const VERSION = '1.0.5';
 function safeNetworkInterfaces() {
   try { return os.networkInterfaces() || {}; }
   catch { return {}; }
@@ -1580,8 +1580,11 @@ const server = http.createServer(async (req, res) => {
       });
       while (!closed && !res.destroyed) {
         try {
-          const state = await getObsState();
-          const sceneName = requestedScene || state.currentProgramSceneName;
+          let sceneName = requestedScene;
+          if (!sceneName) {
+            const state = await getObsState();
+            sceneName = state.currentProgramSceneName;
+          }
           if (!sceneName) throw new Error('OBS sem cena no ar.');
           const image = await getObsScreenshot({
             sourceName: sceneName, width: 640, height: 360, quality: 52, ttlMs: 120,
@@ -1649,7 +1652,7 @@ startDeckDiscovery();
 const configAtStart = loadConfig();
 server.listen(configAtStart.deckPort, '0.0.0.0', () => {
   console.log('\n=============================================');
-  console.log('          WORSHIP DECK 1.0.4');
+  console.log('          WORSHIP DECK 1.0.5');
   console.log('=============================================');
   console.log(`PC local: http://localhost:${configAtStart.deckPort}`);
   const nets = safeNetworkInterfaces();
