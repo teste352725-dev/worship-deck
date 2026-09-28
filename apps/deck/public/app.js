@@ -764,7 +764,23 @@ function renderMobileCore() {
   renderMobileMonitor();
 }
 
+
+function renderMobileObsLive() {
+  const holder = $('#mobileObsLive');
+  if (!holder) return;
+  if (!obsState.connected || !obsState.currentProgramSceneName) {
+    holder.innerHTML = '<div class="mobile-obs-live-empty">OBS sem vídeo disponível.</div>';
+    holder.dataset.scene = '';
+    return;
+  }
+  const scene = obsState.currentProgramSceneName;
+  if (holder.dataset.scene === scene && holder.querySelector('img')) return;
+  holder.dataset.scene = scene;
+  holder.innerHTML = `<img src="/api/obs/live.mjpg" alt="Vídeo ao vivo do OBS" /><span><b>● AO VIVO</b>${escapeHtml(scene)}</span>`;
+}
+
 function renderMobileObs() {
+  renderMobileObsLive();
   const pageSize = mobilePageSize();
   if (!obsState.connected) {
     const item = [{ sceneName: obsState.error ? 'OBS DESCONECTADO' : 'CONFIGURE O OBS' }];
@@ -829,9 +845,9 @@ function monitorMarkup(force = false, floating = false) {
   let html = '';
   if (mode === 'obs') {
     const scene = obsState.currentProgramSceneName || '';
-    key += `:${scene}:${Math.floor(Date.now()/1600)}`;
+    key += `:${scene}:live`;
     html = scene
-      ? `<img class="mobile-monitor-img" src="${escapeHtml(obsScreenshotUrl(scene,'program',force))}" alt="Programa OBS" />`
+      ? `<img class="mobile-monitor-img" src="/api/obs/live.mjpg" alt="Programa OBS ao vivo" />`
       : '<div class="mobile-monitor-empty">OBS sem cena no ar.</div>';
   } else if (mode === 'holyrics') {
     const url = mobileHolyricsPreviewUrl();
