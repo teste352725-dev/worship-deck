@@ -768,15 +768,34 @@ function renderMobileCore() {
 function renderMobileObsLive() {
   const holder = $('#mobileObsLive');
   if (!holder) return;
-  if (!obsState.connected || !obsState.currentProgramSceneName) {
+  const cameras = [
+    { label: 'Câmera Púlpito', sceneName: cameraConfig.pulpitScene },
+    { label: 'Câmera Frente', sceneName: cameraConfig.frontScene },
+  ];
+  const signature = cameras.map(camera => camera.sceneName || '-').join('|') + '|' + (obsState.currentProgramSceneName || '');
+  if (holder.dataset.signature === signature && holder.querySelector('img')) return;
+  holder.dataset.signature = signature;
+
+  if (!obsState.connected) {
     holder.innerHTML = '<div class="mobile-obs-live-empty">OBS sem vídeo disponível.</div>';
-    holder.dataset.scene = '';
     return;
   }
-  const scene = obsState.currentProgramSceneName;
-  if (holder.dataset.scene === scene && holder.querySelector('img')) return;
-  holder.dataset.scene = scene;
-  holder.innerHTML = `<img src="/api/obs/live.mjpg" alt="Vídeo ao vivo do OBS" /><span><b>● AO VIVO</b>${escapeHtml(scene)}</span>`;
+
+  holder.innerHTML = cameras.map(camera => {
+    const scene = (obsState.scenes || []).find(item => item.sceneName === camera.sceneName);
+    const active = Boolean(camera.sceneName && camera.sceneName === obsState.currentProgramSceneName);
+    if (!camera.sceneName || !scene) {
+      return `<button type="button" class="mobile-camera-live-tile unavailable" disabled>
+        <span class="mobile-camera-live-empty">${camera.sceneName ? 'Cena não encontrada' : 'Configure esta câmera'}</span>
+        <span class="mobile-camera-live-label"><strong>${escapeHtml(camera.label)}</strong><small>SEM VÍDEO</small></span>
+      </button>`;
+    }
+    return `<button type="button" class="mobile-camera-live-tile${active ? ' active' : ''}" data-obs-scene="${escapeHtml(scene.sceneName)}" data-obs-uuid="${escapeHtml(scene.sceneUuid || '')}">
+      <img src="/api/obs/live.mjpg?sceneName=${encodeURIComponent(scene.sceneName)}" alt="Vídeo da ${escapeHtml(camera.label)}" />
+      <span class="mobile-camera-live-label"><strong>${escapeHtml(camera.label)}</strong><small>${active ? '● NO AR' : 'TOCAR PARA EXIBIR'}</small></span>
+    </button>`;
+  }).join('');
+  bindObsButtons(holder);
 }
 
 function renderMobileObs() {
