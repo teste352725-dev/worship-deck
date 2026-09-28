@@ -26,8 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import android.app.Activity;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -46,7 +45,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     private static final String PREFS = "worship_deck_mobile";
     private static final String KEY_LOCAL = "local_url";
     private static final String KEY_REMOTE = "remote_url";
