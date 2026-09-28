@@ -69,8 +69,18 @@ public class MainActivity extends Activity {
         super.onCreate(state);
         prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         buildScreen();
+        applySystemInsets();
         configureWebView();
         discover(true);
+    }
+
+
+    private void applySystemInsets() {
+        root.setOnApplyWindowInsetsListener((view, insets) -> {
+            view.setPadding(0, insets.getSystemWindowInsetTop(), 0, insets.getSystemWindowInsetBottom());
+            return insets;
+        });
+        root.requestApplyInsets();
     }
 
     private int dp(int value) {
