@@ -42,11 +42,22 @@ jobs:
             Write-Host "A etiqueta v$version já existe."
           }
 
-      - name: Gerar e publicar atualização
+      - name: Gerar atualização
+        shell: pwsh
+        run: npx electron-builder --win nsis --publish never
+
+      - name: Publicar arquivos da atualização
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --win nsis --publish always
+        run: |
+          $version = node -p "require('./package.json').version"
+          $tag = "v$version"
+          gh release view $tag 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag --title $version --notes "[release] Worship Deck $version"
+          }
+          gh release upload $tag "dist-desktop/WorshipDeck-Setup-$version-x64.exe" "dist-desktop/WorshipDeck-Setup-$version-x64.exe.blockmap" "dist-desktop/latest.yml" --clobber
 
       - name: Guardar instalador
         uses: actions/upload-artifact@v4
