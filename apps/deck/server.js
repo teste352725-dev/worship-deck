@@ -13,7 +13,7 @@ const PUBLIC = path.join(APP_ROOT, 'public');
 const CONFIG_FILE = path.join(DATA_ROOT, 'config.json');
 const PROFILES_DIR = path.join(DATA_ROOT, 'profiles');
 try { fs.mkdirSync(DATA_ROOT, { recursive: true }); } catch {}
-const VERSION = '1.0.2';
+const VERSION = '1.0.3';
 function safeNetworkInterfaces() {
   try { return os.networkInterfaces() || {}; }
   catch { return {}; }
@@ -31,6 +31,8 @@ const DEFAULT_CONFIG = {
   obsHost: '127.0.0.1',
   obsPort: 4455,
   obsPassword: '',
+  cameraPulpitScene: '',
+  cameraFrontScene: '',
   automationEnabled: false,
   autoSongScene: '',
   autoVerseScene: '',
@@ -150,6 +152,8 @@ function saveConfig(next) {
     obsPort: Number(next.obsPort || current.obsPort || 4455),
     token: typeof next.token === 'string' && next.token.length ? next.token.trim() : current.token,
     obsPassword: typeof next.obsPassword === 'string' && next.obsPassword.length ? next.obsPassword : current.obsPassword,
+    cameraPulpitScene: Object.prototype.hasOwnProperty.call(next, 'cameraPulpitScene') ? String(next.cameraPulpitScene || '').trim().slice(0, 200) : String(current.cameraPulpitScene || ''),
+    cameraFrontScene: Object.prototype.hasOwnProperty.call(next, 'cameraFrontScene') ? String(next.cameraFrontScene || '').trim().slice(0, 200) : String(current.cameraFrontScene || ''),
     automationEnabled: typeof next.automationEnabled === 'boolean' ? next.automationEnabled : Boolean(current.automationEnabled),
     autoSongScene: Object.prototype.hasOwnProperty.call(next, 'autoSongScene') ? String(next.autoSongScene || '').trim() : String(current.autoSongScene || ''),
     autoVerseScene: Object.prototype.hasOwnProperty.call(next, 'autoVerseScene') ? String(next.autoVerseScene || '').trim() : String(current.autoVerseScene || ''),
@@ -293,6 +297,8 @@ function publicConfig(cfg = loadConfig()) {
     obsHost: cfg.obsHost || '127.0.0.1',
     obsPort: cfg.obsPort || 4455,
     obsPasswordConfigured: Boolean(cfg.obsPassword),
+    cameraPulpitScene: cfg.cameraPulpitScene || '',
+    cameraFrontScene: cfg.cameraFrontScene || '',
     automationEnabled: Boolean(cfg.automationEnabled),
     autoSongScene: cfg.autoSongScene || '',
     autoVerseScene: cfg.autoVerseScene || '',
@@ -1579,7 +1585,7 @@ startAgentDiscovery();
 const configAtStart = loadConfig();
 server.listen(configAtStart.deckPort, '0.0.0.0', () => {
   console.log('\n=============================================');
-  console.log('          WORSHIP DECK 1.0.2');
+  console.log('          WORSHIP DECK 1.0.3');
   console.log('=============================================');
   console.log(`PC local: http://localhost:${configAtStart.deckPort}`);
   const nets = safeNetworkInterfaces();
