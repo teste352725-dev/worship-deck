@@ -19,6 +19,7 @@ const STORE_SCHEMA = 1;
 const ROLE_RANK = { guest: 0, operator: 1, advanced: 2, admin: 3 };
 const pendingDeviceTokens = new Map();
 const pairingCodes = new Map();
+const mediaTickets = new Map();
 const loginFailures = new Map();
 
 function nowIso() { return new Date().toISOString(); }
@@ -344,6 +345,22 @@ async function handleSecurityApi(req, res) {
     return true;
   }
 
+  if (pathname === '/api/security/media-ticket' && req.method === 'POST') {
+    const identity = identityFor(req);
+    if (!hasRole(identity, 'operator')) {
+      sendJson(res, 403, { status:'error', error:'A prévia do OBS exige um aparelho autorizado.' });
+      return true;
+    }
+    const token = randomToken(24);
+    const expiresAt = Date.now() + 10 * 60 * 1000;
+    mediaTickets.set(token, { expiresAt, deviceId: identity.device?.id || 'loopback' });
+    for (const [key, value] of mediaTickets) {
+      if (!value || value.expiresAt < Date.now()) mediaTickets.delete(key);
+    }
+    sendJson(res, 200, { status:'ok', ticket:token, expiresInMs:10 * 60 * 1000 });
+    return true;
+  }
+
   if (pathname === '/api/security/admin/setup' && req.method === 'POST') {
     const body = await readJson(req);
     if (adminConfigured()) requireAdmin(req);
@@ -473,8 +490,15 @@ async function handleSecurityApi(req, res) {
 }
 
 function authorizeApi(req, res) {
-  const pathname = new URL(req.url, 'http://local').pathname;
+  const url = new URL(req.url, 'http://local');
+  const pathname = url.pathname;
   if (!pathname.startsWith('/api/')) return true;
+  if (req.method === 'GET' && pathname === '/api/obs/live.mjpg') {
+    const ticket = safeText(url.searchParams.get('ticket'), 160);
+    const entry = mediaTickets.get(ticket);
+    if (entry && entry.expiresAt > Date.now()) return true;
+    if (ticket) mediaTickets.delete(ticket);
+  }
   const required = routeMinimumRole(req);
   const identity = identityFor(req);
   if (hasRole(identity, required)) return true;
