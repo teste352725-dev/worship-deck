@@ -12,6 +12,7 @@ let favorites = [];
 let favoriteError = '';
 let obsState = { connected: false, scenes: [], currentProgramSceneName: null, error: '' };
 let cameraConfig = { pulpitScene: '', frontScene: '' };
+let obsMediaTicket = { value: '', expiresAt: 0, pending: null };
 let previewConfig = { pluginHost: '127.0.0.1', pluginPort: 2026, previewMode: 'widescreen' };
 let automationConfig = { enabled: false, songScene: '', verseScene: '', noneScene: '', favoriteSceneMap: {}, state: {} };
 let automationEditorDirty = false;
@@ -765,7 +766,23 @@ function renderMobileCore() {
 }
 
 
-function renderMobileObsLive() {
+
+async function ensureObsMediaTicket() {
+  if (obsMediaTicket.value && obsMediaTicket.expiresAt > Date.now() + 30000) return obsMediaTicket.value;
+  if (obsMediaTicket.pending) return obsMediaTicket.pending;
+  obsMediaTicket.pending = fetch('/api/security/media-ticket', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}',
+  }).then(async response => {
+    const data = await response.json();
+    if (!response.ok || !data.ticket) throw new Error(data.error || 'Prévia do OBS não autorizada.');
+    obsMediaTicket.value = data.ticket;
+    obsMediaTicket.expiresAt = Date.now() + Number(data.expiresInMs || 480000);
+    return data.ticket;
+  }).finally(() => { obsMediaTicket.pending = null; });
+  return obsMediaTicket.pending;
+}
+
+async function renderMobileObsLive() {
   const holder = $('#mobileObsLive');
   if (!holder) return;
   const cameras = [
@@ -781,6 +798,14 @@ function renderMobileObsLive() {
     return;
   }
 
+  let mediaTicket = '';
+  try {
+    mediaTicket = await ensureObsMediaTicket();
+  } catch (error) {
+    holder.innerHTML = '<div class="mobile-obs-live-empty">Autorize este aparelho para ver o vídeo do OBS.</div>';
+    return;
+  }
+
   holder.innerHTML = cameras.map(camera => {
     const scene = (obsState.scenes || []).find(item => item.sceneName === camera.sceneName);
     const active = Boolean(camera.sceneName && camera.sceneName === obsState.currentProgramSceneName);
@@ -791,7 +816,7 @@ function renderMobileObsLive() {
       </button>`;
     }
     return `<button type="button" class="mobile-camera-live-tile${active ? ' active' : ''}" data-obs-scene="${escapeHtml(scene.sceneName)}" data-obs-uuid="${escapeHtml(scene.sceneUuid || '')}">
-      <img src="/api/obs/live.mjpg?sceneName=${encodeURIComponent(scene.sceneName)}" alt="Vídeo da ${escapeHtml(camera.label)}" />
+      <img src="/api/obs/live.mjpg?sceneName=${encodeURIComponent(scene.sceneName)}&ticket=${encodeURIComponent(mediaTicket)}" alt="" onerror="this.style.display='none'" />
       <span class="mobile-camera-live-label"><strong>${escapeHtml(camera.label)}</strong><small>${active ? '● NO AR' : 'TOCAR PARA EXIBIR'}</small></span>
     </button>`;
   }).join('');
